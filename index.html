@@ -1435,13 +1435,18 @@ function saveNote(nombre,texto){
 function openSettings(){
   const bg=document.getElementById('cfg-bg');
   if(!bg)return;
+  bg.style.display='flex';  // Overrides inline display:none
   bg.classList.add('open');
+  // Cerrar Beni si está abierto para evitar superposición
+  if(_beniOpen) beniToggle();
   cfgTab(1);
 }
 
 function closeSettings(){
   const bg=document.getElementById('cfg-bg');
-  if(bg)bg.classList.remove('open');
+  if(!bg)return;
+  bg.classList.remove('open');
+  bg.style.display='none';
 }
 
 function cfgTab(n){
@@ -3696,7 +3701,12 @@ async function beniLlamar(tipo,contexto,persona,mensajes){
       body:JSON.stringify({tipo,contexto,persona,mensajes,usuario:C.nombreUsuario||null})
     });
     const data=await resp.json();
-    if(!resp.ok||data.error){beniReplaceMsg(loadId,`Error: ${data.error||'Sin respuesta de Beni'}`);return '';}
+    if(!resp.ok||data.error){
+      const errMsg=data.error||'Sin respuesta de Beni';
+      console.error('Beni error:',data);
+      beniReplaceMsg(loadId,`⚠️ ${errMsg}`);
+      return '';
+    }
     const txt=data.respuesta||'';
     beniReplaceMsg(loadId,txt.replace(/\n/g,'<br>'));
     _beniMsgs.push({role:'assistant',content:txt});
@@ -3911,7 +3921,7 @@ async function beniSeñalesRiesgo(){
   if(txt) txt.innerHTML='<em style="opacity:.5">Analizando señales...</em>';
 
   const contexto={alertas_detectadas:alertasDetectadas,resumen_equipo:resumen,total:equipo.length,fecha:hoy};
-  const respuesta=await beniLlamarSilencioso('señales_riesgo',contexto,null);
+  const respuesta=await beniLlamarSilencioso('senales_riesgo',contexto,null);
   if(txt&&respuesta) txt.innerHTML=respuesta.replace(/\n/g,'<br>');
 }
 
