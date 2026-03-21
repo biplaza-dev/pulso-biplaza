@@ -539,6 +539,10 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke-width="2"/></svg>
       Gestionar equipo
     </div>
+    <div class="ni" id="ni-dp" onclick="go('dp',this)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke-width="2"/><line x1="16" y1="13" x2="8" y2="13" stroke-width="2"/><line x1="16" y1="17" x2="8" y2="17" stroke-width="2"/><polyline points="10,9 9,9 8,9" stroke-width="2"/></svg>
+      Puestos de trabajo
+    </div>
     <div class="ni" id="ni-ay" onclick="go('ay',this)">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" stroke-width="2"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2"/></svg>
       Metodología
@@ -767,6 +771,11 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
       </div>
     </div>
 
+    <!-- DIRECTORIO DE PUESTOS DE TRABAJO -->
+    <div class="scr" id="s-dp">
+      <div id="dp-content"></div>
+    </div>
+
     <!-- METODOLOGÍA -->
     <div class="scr" id="s-ay">
       <!-- Tab bar -->
@@ -824,7 +833,7 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
 
 
 <!-- SETTINGS DRAWER -->
-<div id="cfg-bg" onclick="if(event.target===this)closeSettings()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:300;align-items:flex-start;justify-content:flex-end">
+<div id="cfg-bg" onclick="if(event.target===this)closeSettings()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9999;align-items:flex-start;justify-content:flex-end">
   <div id="cfg-panel" style="width:420px;height:100%;background:var(--wh);box-shadow:-4px 0 24px rgba(0,0,0,0.12);display:flex;flex-direction:column;animation:slideIn 0.2s ease">
     <!-- Header -->
     <div style="padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -838,13 +847,17 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
     </div>
     <!-- Tabs -->
     <div style="display:flex;border-bottom:1px solid var(--bd);flex-shrink:0">
-      <div id="cfg-t1" onclick="cfgTab(1)" style="padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid var(--oro);color:var(--oroD);margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all 0.13s">
+      <div id="cfg-t1" onclick="cfgTab(1)" style="padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid var(--oro);color:var(--oroD);margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all 0.13s">
         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-width="2"/></svg>
         Datos
       </div>
-      <div id="cfg-t2" onclick="cfgTab(2)" style="padding:10px 20px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all 0.13s">
+      <div id="cfg-t2" onclick="cfgTab(2)" style="padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all 0.13s">
         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-width="2"/></svg>
         Factorial
+      </div>
+      <div id="cfg-t3" onclick="cfgTab(3)" style="padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all 0.13s">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><path d="M9 9h6M9 13h6M9 17h4" stroke-width="2"/></svg>
+        Plantillas
       </div>
     </div>
     <!-- Body -->
@@ -894,6 +907,27 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
           <div>✓ Ausencias y vacaciones</div>
           <div>✓ Asistencia y fichajes</div>
         </div>
+      </div>
+
+      <!-- TAB 3: Plantillas -->
+      <div id="cfg-c3" style="display:none">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px">Plantillas de Puestos de Trabajo</div>
+        <div style="font-size:12px;color:var(--tx3);line-height:1.6;margin-bottom:14px">
+          Define plantillas reutilizables por tipo de cargo. Al completar la DPT de una persona puedes importar su plantilla y ahorrar tiempo.
+        </div>
+        <button class="bfull go" onclick="plantillaCrear()" style="margin-bottom:14px">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke-width="2"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="2"/></svg>
+          Nueva plantilla de puesto
+        </button>
+        <div id="cfg-plantillas-list">
+          <div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px;font-style:italic">Cargando...</div>
+        </div>
+        <div class="divider" style="margin:22px 0"></div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px">Guión One-to-One</div>
+        <div style="font-size:12px;color:var(--tx3);line-height:1.6;margin-bottom:14px">
+          El guión se estructura en 5 bloques fijos (metodología CFR). Puedes añadir preguntas personalizadas a cada bloque.
+        </div>
+        <div id="cfg-oto-bloques"></div>
       </div>
 
     </div>
@@ -1398,7 +1432,7 @@ function closeSettings(){
 }
 
 function cfgTab(n){
-  [1,2].forEach(i=>{
+  [1,2,3].forEach(i=>{
     const t=document.getElementById('cfg-t'+i);
     const c=document.getElementById('cfg-c'+i);
     const on=i===n;
@@ -1406,6 +1440,7 @@ function cfgTab(n){
     if(c)c.style.display=on?'block':'none';
   });
   if(n===1)updateStorageInfo();
+  if(n===3){rendPlantillasList();rendOTOBloques();}
 }
 
 function updateStorageInfo(){
@@ -1443,7 +1478,7 @@ function go(id,el){
   const niQs=document.getElementById('ni-qs');
   if(niQs)niQs.classList.add('cta');
   if(el)el.classList.add('on');
-  const T={db:'Dashboard',cal:'Calendario',qs:'Iniciar One to One',eq:'Equipo',ses:'Sesión activa',hi:'Historial',prof:'Perfil',tm:'Gestionar equipo',ay:'Metodología'};
+  const T={db:'Dashboard',cal:'Calendario',qs:'Iniciar One to One',eq:'Equipo',ses:'Sesión activa',hi:'Historial',prof:'Perfil',tm:'Gestionar equipo',dp:'Puestos de trabajo',ay:'Metodología'};
   document.getElementById('tb-title').textContent=T[id]||id;
   document.getElementById('tb-crumb').textContent='';
   const mb=document.getElementById('mainbody');
@@ -1457,6 +1492,7 @@ function go(id,el){
   if(id==='hi')rendHi();
   if(id==='prof')rendProf();
   if(id==='tm')rendTM();
+  if(id==='dp')rendDP();
   if(id==='ay')rendAY();
 }
 
@@ -2485,7 +2521,13 @@ async function rendProfDPT(){
 
   let h=`<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
     <span style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px">DPT · ${p.n}</span>
-    <span style="font-size:12px;font-weight:700;color:${pct===100?'var(--ok)':pct>50?'var(--oroD)':'var(--tx3)'}" id="dpt-pct-lbl">${pct}% completada</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button style="background:none;border:1px solid var(--bd);border-radius:var(--r3);padding:3px 9px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;font-family:var(--f)"
+        onmouseover="this.style.borderColor='var(--oro)';this.style.color='var(--oroD)'"
+        onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tx3)'"
+        onclick="plantillaImportar('${p.n}')">↓ Importar plantilla</button>
+      <span style="font-size:12px;font-weight:700;color:${pct===100?'var(--ok)':pct>50?'var(--oroD)':'var(--tx3)'}" id="dpt-pct-lbl">${pct}% completada</span>
+    </div>
     </div><div class="dpt-prog"><div class="dpt-prog-bar" id="dpt-pct-bar" style="width:${pct}%"></div></div></div>`;
 
   h+=`<div class="dpt-blk">${blkHd('1','El puesto','Cargo, objetivo y funciones principales',!!(b1.cargo&&b1.objetivo&&b1.funciones))}
@@ -2641,6 +2683,35 @@ async function toggleOn(i){
   rendTM();
 }
 
+// ── Helper de sesión — siempre fresca ───────────────────────────────────────
+// Intenta obtener sesión válida. Si está expirada, la refresca.
+// Si no hay sesión, fuerza login.
+async function getSessionToken(){
+  try{
+    let {data:{session}}=await sb.auth.getSession();
+    if(session?.access_token){
+      // Verificar si expira en menos de 60 segundos
+      const exp=session.expires_at||0;
+      const ahoraMs=Date.now()/1000;
+      if(exp-ahoraMs<60){
+        const {data:refreshed}=await sb.auth.refreshSession();
+        if(refreshed?.session) return refreshed.session.access_token;
+      }else{
+        return session.access_token;
+      }
+    }
+    // Sin sesión válida — refrescar
+    const {data:refreshed}=await sb.auth.refreshSession();
+    if(refreshed?.session) return refreshed.session.access_token;
+    // Nada funciona — forzar login
+    showLogin();
+    return null;
+  }catch(e){
+    console.warn('Session error',e);
+    return null;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 //  FACTORIAL — Integración de lectura (visión, no gestión)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2649,12 +2720,12 @@ const FAC_PROXY='https://lpxvatcwkerrrokrwwqt.supabase.co/functions/v1/factorial
 const FAC_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweHZhdGN3a2VycnJva3J3d3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTcwMDgsImV4cCI6MjA4OTU3MzAwOH0.or9l-I4qhwpcbQwuKYdeyJZbL-wauyExZmpEwPq7pcA';
 
 async function facCall(endpoint, params={}){
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session) return null;
+  const token=await getSessionToken();
+  if(!token) return null;
   const qs=new URLSearchParams({endpoint,...params}).toString();
   try{
     const resp=await fetch(`${FAC_PROXY}?${qs}`,{
-      headers:{'Authorization':`Bearer ${session.access_token}`,'apikey':FAC_KEY}
+      headers:{'Authorization':`Bearer ${token}`,'apikey':FAC_KEY}
     });
     if(!resp.ok) return null;
     const data=await resp.json();
@@ -3079,7 +3150,275 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  BENI — Copiloto IA
+//  PLANTILLAS DE PUESTOS DE TRABAJO
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function rendPlantillasList(){
+  const el=document.getElementById('cfg-plantillas-list');
+  if(!el) return;
+  el.innerHTML='<div style="text-align:center;padding:16px;color:var(--tx3);font-size:12px">Cargando...</div>';
+  try{
+    const {data:plantillas}=await sb.from('plantillas_puesto').select('*').order('area').order('nombre');
+    if(!plantillas?.length){
+      el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px;font-style:italic">Sin plantillas aún. Crea la primera.</div>`;
+      return;
+    }
+    const porArea={};
+    plantillas.forEach(p=>{if(!porArea[p.area])porArea[p.area]=[];porArea[p.area].push(p);});
+    let h='';
+    Object.entries(porArea).forEach(([area,lista])=>{
+      h+=`<div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px">${area||'Sin área'}</div>`;
+      lista.forEach(p=>{
+        h+=`<div style="background:var(--cream);border:1px solid var(--bd);border-radius:var(--r2);padding:11px 14px;margin-bottom:7px;display:flex;align-items:center;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
+            ${p.descripcion?`<div style="font-size:11px;color:var(--tx3);margin-top:2px">${p.descripcion}</div>`:''}
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button style="background:none;border:1px solid var(--bd);border-radius:var(--r3);padding:4px 10px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;font-family:var(--f)"
+              onmouseover="this.style.borderColor='var(--oro)';this.style.color='var(--oroD)'"
+              onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tx3)'"
+              onclick="plantillaEditar('${p.id}')">Editar</button>
+            <button style="background:none;border:1px solid var(--cD);border-radius:var(--r3);padding:4px 8px;font-size:11px;color:var(--tx4);cursor:pointer;font-family:var(--f)"
+              onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'"
+              onmouseout="this.style.borderColor='var(--cD)';this.style.color='var(--tx4)'"
+              onclick="plantillaEliminar('${p.id}','${p.nombre.replace(/'/g,"\\'")}')" title="Eliminar">✕</button>
+          </div>
+        </div>`;
+      });
+    });
+    el.innerHTML=h;
+  }catch(e){el.innerHTML=`<div style="color:var(--red);font-size:12px">Error cargando plantillas</div>`;}
+}
+
+function plantillaCrear(){_plantillaModal(null);}
+async function plantillaEditar(id){const {data}=await sb.from('plantillas_puesto').select('*').eq('id',id).single();if(data)_plantillaModal(data);}
+
+function _plantillaModal(p){
+  const fi=(id,val,ph)=>`<input id="${id}" value="${(val||'').replace(/"/g,'&quot;')}" placeholder="${ph}" style="width:100%;border:1px solid var(--bd);border-radius:var(--r2);padding:8px 11px;font-size:13px;font-family:var(--f);color:var(--tx);background:var(--wh);outline:none;box-sizing:border-box;margin-bottom:10px" onfocus="this.style.borderColor='var(--oro)'" onblur="this.style.borderColor='var(--bd)'">`;
+  const ta=(id,val,ph,rows)=>`<textarea id="${id}" rows="${rows}" placeholder="${ph}" style="width:100%;border:1px solid var(--bd);border-radius:var(--r2);padding:8px 11px;font-size:13px;font-family:var(--f);color:var(--tx);background:var(--wh);resize:vertical;outline:none;box-sizing:border-box;line-height:1.5;margin-bottom:10px" onfocus="this.style.borderColor='var(--oro)'" onblur="this.style.borderColor='var(--bd)'">${val||''}</textarea>`;
+  const lbl=(t)=>`<div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px">${t}</div>`;
+  const sec=(t)=>`<div style="font-size:11px;font-weight:700;color:var(--oroD);text-transform:uppercase;letter-spacing:0.5px;margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--bd)">${t}</div>`;
+  const areas=['Laboral','Contable','Fiscal','Jurídica','Admin'];
+  const areaOpts=areas.map(a=>`<option value="${a}"${p?.area===a?' selected':''}>${a}</option>`).join('');
+  const modal=document.getElementById('modal-inner');
+  modal.innerHTML=`<div style="padding:22px 24px;max-height:85vh;overflow-y:auto">
+    <div style="font-size:16px;font-weight:600;margin-bottom:18px">${!p?'Nueva plantilla':'Editar plantilla'}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>${lbl('Nombre del puesto')}${fi('pl-nombre',p?.nombre,'Ej: Asesor/a Contable N1')}</div>
+      <div>${lbl('Área')}<select id="pl-area" style="width:100%;border:1px solid var(--bd);border-radius:var(--r2);padding:8px 11px;font-size:13px;font-family:var(--f);color:var(--tx);background:var(--wh);outline:none;box-sizing:border-box;margin-bottom:10px"><option value="">Selecciona área</option>${areaOpts}</select></div>
+    </div>
+    ${lbl('Descripción breve')}${fi('pl-desc',p?.descripcion,'Ej: Gestión contable de clientes asignados')}
+    ${sec('Bloque 1 · El puesto')}
+    ${lbl('Cargo oficial')}${fi('pl-b1-cargo',p?.bloque_1?.cargo,'Denominación del cargo')}
+    ${lbl('Objetivo general')}${ta('pl-b1-objetivo',p?.bloque_1?.objetivo,'¿Para qué existe este puesto?',2)}
+    ${lbl('Funciones y tareas')}${ta('pl-b1-funciones',p?.bloque_1?.funciones,'Lista las funciones principales...',3)}
+    ${sec('Bloque 2 · El perfil')}
+    ${lbl('Formación requerida')}${fi('pl-b2-form',p?.bloque_2?.formacion,'Ej: FP Grado Superior')}
+    ${lbl('Competencias técnicas')}${ta('pl-b2-tec',p?.bloque_2?.competencias_tecnicas,'Conocimientos técnicos necesarios...',2)}
+    ${lbl('Competencias transversales')}${ta('pl-b2-tra',p?.bloque_2?.competencias_transversales,'Comunicación, trabajo en equipo...',2)}
+    ${sec('Bloque 3 · El desarrollo')}
+    ${lbl('Camino de evolución')}${fi('pl-b3-camino',p?.bloque_3?.camino,'Ej: N2 del mismo área')}
+    ${lbl('Qué debe demostrar')}${ta('pl-b3-demo',p?.bloque_3?.que_debe_demostrar,'Capacidades para pasar al siguiente nivel...',2)}
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn dk" style="flex:1;justify-content:center" onclick="plantillaGuardar('${p?.id||''}')">
+        ${!p?'Crear plantilla':'Guardar cambios'}
+      </button>
+      <button class="btn lt" style="padding:10px 16px" onclick="closeMo()">Cancelar</button>
+    </div>
+    <div id="pl-st" style="font-size:11px;color:var(--tx3);margin-top:8px;text-align:center;min-height:16px"></div>
+  </div>`;
+  openMo();
+}
+
+async function plantillaGuardar(id){
+  const g=(s)=>document.getElementById(s)?.value||'';
+  const nombre=g('pl-nombre').trim();
+  if(!nombre){document.getElementById('pl-st').textContent='El nombre es obligatorio.';return;}
+  const payload={nombre,area:g('pl-area'),descripcion:g('pl-desc'),
+    bloque_1:{cargo:g('pl-b1-cargo'),objetivo:g('pl-b1-objetivo'),funciones:g('pl-b1-funciones')},
+    bloque_2:{formacion:g('pl-b2-form'),competencias_tecnicas:g('pl-b2-tec'),competencias_transversales:g('pl-b2-tra')},
+    bloque_3:{camino:g('pl-b3-camino'),que_debe_demostrar:g('pl-b3-demo')}
+  };
+  const st=document.getElementById('pl-st');
+  if(st)st.textContent='Guardando...';
+  try{
+    const {data:{user}}=await sb.auth.getUser();
+    if(id){await sb.from('plantillas_puesto').update(payload).eq('id',id);}
+    else{await sb.from('plantillas_puesto').insert({...payload,created_by:user?.id});}
+    closeMo();rendPlantillasList();
+  }catch(e){if(st)st.textContent='Error: '+e.message;}
+}
+
+async function plantillaEliminar(id,nombre){
+  if(!confirm(`¿Eliminar la plantilla "${nombre}"?\n\nLas DPTs ya completadas no se verán afectadas.`))return;
+  await sb.from('plantillas_puesto').delete().eq('id',id);
+  rendPlantillasList();
+}
+
+async function plantillaImportar(nombrePersona){
+  const {data:plantillas}=await sb.from('plantillas_puesto').select('*').order('area').order('nombre');
+  if(!plantillas?.length){alert('No hay plantillas aún. Ve a Ajustes → Plantillas para crear la primera.');return;}
+  const modal=document.getElementById('modal-inner');
+  const opts=plantillas.map(p=>`<div style="background:var(--cream);border:1px solid var(--bd);border-radius:var(--r2);padding:11px 14px;margin-bottom:7px;cursor:pointer;transition:all 0.12s"
+    onmouseover="this.style.borderColor='var(--oro)'" onmouseout="this.style.borderColor='var(--bd)'"
+    onclick="plantillaAplicar('${p.id}','${nombrePersona}')">
+    <div style="font-size:13px;font-weight:500;color:var(--tx)">${p.nombre}</div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:2px">${p.area}${p.descripcion?' · '+p.descripcion:''}</div>
+  </div>`).join('');
+  modal.innerHTML=`<div style="padding:22px 24px"><div style="font-size:15px;font-weight:600;margin-bottom:6px">Importar plantilla</div>
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:16px">Los campos vacíos de la DPT de <b>${nombrePersona}</b> se completarán con la plantilla. Los ya rellenos no se sobreescribirán.</div>
+    ${opts}
+    <button class="btn lt" style="width:100%;justify-content:center;margin-top:8px" onclick="closeMo()">Cancelar</button>
+  </div>`;
+  openMo();
+}
+
+async function plantillaAplicar(plantillaId,nombrePersona){
+  const {data:pl}=await sb.from('plantillas_puesto').select('*').eq('id',plantillaId).single();
+  if(!pl)return;
+  const pid=C.pmap[nombrePersona]?.id;if(!pid)return;
+  const {data:dptAct}=await sb.from('dpt').select('*').eq('persona_id',pid).maybeSingle();
+  const merge=(blk,def)=>{const r={...def};Object.keys(blk).forEach(k=>{if(!r[k]||!r[k].trim)r[k]=blk[k];});return r;};
+  const b1=merge(pl.bloque_1,dptAct?.bloque_1||{});
+  const b2=merge(pl.bloque_2,dptAct?.bloque_2||{});
+  const b3=merge(pl.bloque_3,dptAct?.bloque_3||{});
+  const campos=[b1.cargo,b1.objetivo,b1.funciones,b2.formacion,b2.competencias_tecnicas,b2.competencias_transversales,b3.camino,b3.que_debe_demostrar];
+  const pct=Math.round((campos.filter(x=>x&&x.trim&&x.trim().length>0).length/campos.length)*100);
+  const {data:{user}}=await sb.auth.getUser();
+  const payload={persona_id:pid,bloque_1:b1,bloque_2:b2,bloque_3:b3,completitud:pct,updated_by:user?.id};
+  if(dptAct){await sb.from('dpt').update(payload).eq('id',dptAct.id);}
+  else{await sb.from('dpt').insert(payload);}
+  closeMo();rendProfDPT();
+}
+
+function rendOTOBloques(){
+  const el=document.getElementById('cfg-oto-bloques');
+  if(!el||typeof BLOQUES==='undefined')return;
+  let h='';
+  BLOQUES.forEach(b=>{
+    const preguntas=b.rows?b.rows.slice(0,3).map(r=>`· ${r.txt}`).join('<br>'):
+      b.subs?b.subs.flatMap(s=>s.rows).slice(0,3).map(r=>`· ${r.txt}`).join('<br>'):'';
+    h+=`<div style="background:var(--cream);border:1px solid var(--bd);border-radius:var(--r2);padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:${preguntas?'6px':'0'}">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--oroL);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--oroD);flex-shrink:0">${b.num}</div>
+        <div style="font-size:13px;font-weight:500;color:var(--tx);flex:1">${b.t}</div>
+        <div style="font-size:11px;color:var(--tx3)">${b.min} min</div>
+      </div>
+      ${preguntas?`<div style="font-size:11.5px;color:var(--tx3);line-height:1.7;padding-left:30px">${preguntas}</div>`:''}
+    </div>`;
+  });
+  h+=`<div style="font-size:11px;color:var(--tx4);margin-top:10px;text-align:center;line-height:1.6;padding:10px;background:var(--cream);border-radius:var(--r2)">
+    Guión basado en metodología CFR · Management 3.0<br>Edición avanzada de preguntas disponible próximamente.
+  </div>`;
+  el.innerHTML=h;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  DIRECTORIO DE PUESTOS DE TRABAJO
+// ═══════════════════════════════════════════════════════════════════════════
+
+let _dpEdit=null; // puesto en edición
+
+async function rendDP(){
+  const el=document.getElementById('dp-content');
+  if(!el) return;
+  el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--tx3);font-size:13px">Cargando puestos...</div>`;
+
+  // Cargar todos los DPTs con datos de persona
+  let puestos=[];
+  try{
+    const {data}=await sb.from('dpt')
+      .select('*, personas(nombre, area, nivel, activa)')
+      .order('updated_at',{ascending:false});
+    puestos=data||[];
+  }catch(e){console.warn('DPT dir load',e);}
+
+  // Agrupar por área
+  const porArea={};
+  C.team.filter(p=>p.on).forEach(p=>{
+    if(!porArea[p.a]) porArea[p.a]={total:0,conDPT:0,personas:[]};
+    porArea[p.a].total++;
+    const dpt=puestos.find(d=>d.personas?.nombre===p.n);
+    if(dpt&&dpt.completitud>0) porArea[p.a].conDPT++;
+    porArea[p.a].personas.push({...p,dpt:dpt||null});
+  });
+
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div>
+      <div style="font-size:20px;font-weight:600;color:var(--tx)">Puestos de trabajo</div>
+      <div style="font-size:12px;color:var(--tx3);margin-top:3px">${puestos.filter(d=>d.completitud>0).length} de ${C.team.filter(p=>p.on).length} personas con DPT iniciada</div>
+    </div>
+  </div>`;
+
+  // Progreso global
+  const total=C.team.filter(p=>p.on).length;
+  const conDPT=puestos.filter(d=>d.completitud>0).length;
+  const pctGlobal=total?Math.round((conDPT/total)*100):0;
+  h+=`<div class="ibox" style="padding:16px 20px;margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:12px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px">Progreso global</span>
+      <span style="font-size:13px;font-weight:700;color:${pctGlobal===100?'var(--ok)':pctGlobal>50?'var(--oroD)':'var(--tx3)'}">${pctGlobal}%</span>
+    </div>
+    <div class="dpt-prog"><div class="dpt-prog-bar" style="width:${pctGlobal}%"></div></div>
+    <div style="display:flex;gap:16px;margin-top:10px">
+      ${Object.entries(porArea).map(([area,data])=>{
+        const pct=data.total?Math.round((data.conDPT/data.total)*100):0;
+        return `<div style="flex:1;text-align:center">
+          <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-bottom:4px">${area}</div>
+          <div style="font-size:16px;font-weight:700;color:${pct===100?'var(--ok)':pct>0?'var(--oroD)':'var(--tx4)'}">${pct}%</div>
+          <div style="font-size:10px;color:var(--tx4)">${data.conDPT}/${data.total}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  // Lista por área
+  Object.entries(porArea).forEach(([area,data])=>{
+    h+=`<div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <span class="dot-${area==='Laboral'?'lab':area==='Contable'?'con':area==='Fiscal'?'fis':area==='Jurídica'?'jur':'adm'}" style="width:8px;height:8px;border-radius:50%;background:var(--oroD);display:inline-block"></span>
+        ${area} · ${data.conDPT}/${data.total} con DPT
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">`;
+
+    data.personas.forEach(p=>{
+      const dpt=p.dpt;
+      const pct=dpt?.completitud||0;
+      const cargo=dpt?.bloque_1?.cargo||'Sin cargo definido';
+      const estado=pct===0?'Pendiente':pct===100?'Completa':'En progreso';
+      const color=pct===0?'var(--tx4)':pct===100?'var(--ok)':'var(--oroD)';
+
+      h+=`<div class="ibox" style="padding:14px 16px;cursor:pointer;transition:all 0.13s" 
+        onmouseover="this.style.borderColor='var(--oro)'" 
+        onmouseout="this.style.borderColor='var(--bd)'"
+        onclick="openProfDirect('${p.n}');profTabAct='dpt';setTimeout(()=>profTab('dpt'),100)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div class="av-sm">${ini(p.n)}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.n}</div>
+            <div style="font-size:11px;color:var(--tx3)">${p.nv}</div>
+          </div>
+          <span style="font-size:10px;font-weight:700;color:${color};white-space:nowrap">${estado}</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--tx3);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cargo}</div>
+        <div style="height:3px;background:var(--cD);border-radius:2px;overflow:hidden">
+          <div style="height:100%;background:${color};width:${pct}%;border-radius:2px;transition:width 0.3s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px">
+          <span style="font-size:10px;color:var(--tx4)">${pct}% completada</span>
+          <span style="font-size:10px;color:var(--oroD)">Editar →</span>
+        </div>
+      </div>`;
+    });
+
+    h+=`</div></div>`;
+  });
+
+  el.innerHTML=h;
+}
+
+
 // ═══════════════════════════════════════════════════════════════════════════
 
 const BENI_URL='https://lpxvatcwkerrrokrwwqt.supabase.co/functions/v1/beni';
@@ -3188,12 +3527,12 @@ async function beniOrg(){
 async function beniLlamar(tipo,contexto,persona,mensajes){
   const loadId='bl'+Date.now();
   beniAddMsg('beni','<em style="opacity:.5;font-size:12px">Pensando...</em>',loadId);
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session){beniReplaceMsg(loadId,'Error: no hay sesión activa.');return '';}
+  const token=await getSessionToken();
+  if(!token){beniReplaceMsg(loadId,'Sesión expirada. Recarga la página.');return '';}
   try{
     const resp=await fetch(BENI_URL,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`,'apikey':FAC_KEY},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,'apikey':FAC_KEY},
       body:JSON.stringify({tipo,contexto,persona,mensajes})
     });
     const data=await resp.json();
