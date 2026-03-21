@@ -839,25 +839,24 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
       <!-- TAB 2: Factorial -->
       <div id="cfg-c2" style="display:none">
         <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px">Sincronización con Factorial</div>
-        <div style="background:var(--sb);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px">
-          <div style="font-size:12px;color:rgba(255,255,255,0.85);font-weight:500;margin-bottom:6px">URL del proxy Cloudflare</div>
-          <input class="api-inp" type="text" id="fac-proxy" placeholder="https://pulso-biplaza-factorial.xxx.workers.dev" style="margin-top:0">
-          <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:7px;line-height:1.5">La API key de Factorial se guarda como secret cifrado en Cloudflare — no hace falta introducirla aquí.</div>
+        <div style="background:rgba(216,165,95,0.08);border:1px solid rgba(216,165,95,0.2);border-radius:var(--r2);padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+          <svg width="16" height="16" fill="none" stroke="var(--oro)" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke-width="2"/><polyline points="22 4 12 14.01 9 11.01" stroke-width="2"/></svg>
+          <div style="font-size:12px;color:var(--tx2);line-height:1.5">Conectado vía <strong style="color:var(--oro)">Supabase Edge Function</strong>. La API key está cifrada en el servidor — no requiere configuración adicional.</div>
         </div>
         <button class="bfull go" onclick="syncFactorial()" style="margin-bottom:8px">
           <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke-width="2"/></svg>
           Sincronizar equipo
         </button>
-        <button class="bfull lt" onclick="openModal('proxy-help')">¿Cómo configurar el proxy?</button>
         <div class="sync-st idle" id="sync-st" style="margin-top:8px;font-size:11px">Sin sincronizar</div>
 
         <div class="divider" style="margin:20px 0"></div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Guía rápida de deploy</div>
-        <div style="font-size:12px;color:var(--tx2);line-height:1.8">
-          <div style="margin-bottom:6px"><span style="font-weight:700;color:var(--oroD)">1.</span> <code style="background:var(--cream);padding:2px 6px;border-radius:4px;font-size:11px">npm install -g wrangler</code></div>
-          <div style="margin-bottom:6px"><span style="font-weight:700;color:var(--oroD)">2.</span> <code style="background:var(--cream);padding:2px 6px;border-radius:4px;font-size:11px">wrangler login</code></div>
-          <div style="margin-bottom:6px"><span style="font-weight:700;color:var(--oroD)">3.</span> <code style="background:var(--cream);padding:2px 6px;border-radius:4px;font-size:11px">wrangler secret put FACTORIAL_API_KEY</code></div>
-          <div style="margin-bottom:6px"><span style="font-weight:700;color:var(--oroD)">4.</span> <code style="background:var(--cream);padding:2px 6px;border-radius:4px;font-size:11px">wrangler deploy</code> → copia la URL</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Datos disponibles desde Factorial</div>
+        <div style="font-size:12px;color:var(--tx2);line-height:1.9">
+          <div>✓ Empleados — nombre, email, departamento</div>
+          <div>✓ Contratos y cargos</div>
+          <div>✓ Equipos y estructura</div>
+          <div>✓ Ausencias y vacaciones</div>
+          <div>✓ Asistencia y fichajes</div>
         </div>
       </div>
 
@@ -1045,9 +1044,9 @@ const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  CACHÉ EN MEMORIA — sustituye localStorage para datos de negocio
-//  localStorage solo persiste: K.F (config Factorial) y K.A (UI áreas)
+//  localStorage solo persiste: K.A (UI áreas)
 // ═══════════════════════════════════════════════════════════════════════════
-const K={F:'pb6_fac',A:'pb6_areas'};
+const K={A:'pb6_areas'};
 
 // Caché principal — se llena en initApp() y se mantiene sincronizado
 const C={
@@ -1193,8 +1192,8 @@ async function loginMicrosoft(){
   const {error}=await sb.auth.signInWithOAuth({
     provider:'azure',
     options:{
-      scopes:'email profile openid',
-      redirectTo:window.location.href
+      scopes:'openid email profile',
+      redirectTo:window.location.origin+'/'
     }
   });
   if(error&&err)err.textContent='Error: '+error.message;
@@ -1348,10 +1347,6 @@ function openSettings(){
   if(!bg)return;
   bg.classList.add('open');
   cfgTab(1);
-  // Load stored proxy URL
-  const fac=JSON.parse(localStorage.getItem(K.F)||'{}');
-  const fp=document.getElementById('fac-proxy');
-  if(fp&&fac.proxy)fp.value=fac.proxy;
 }
 
 function closeSettings(){
@@ -2428,44 +2423,67 @@ async function toggleOn(i){
 }
 
 async function syncFactorial(){
-  const proxy=document.getElementById('fac-proxy').value.trim();
   const st=document.getElementById('sync-st');
-  if(!proxy){if(st){st.textContent='Introduce la URL del proxy de Cloudflare.';st.className='sync-st err';}return;}
-  // Save proxy URL for next time
-  const fac=JSON.parse(localStorage.getItem(K.F)||'{}');
-  fac.proxy=proxy;localStorage.setItem(K.F,JSON.stringify(fac));
   if(st){st.textContent='Conectando con Factorial...';st.className='sync-st idle';}
-  // Try both API v1 and v2 endpoints
-  const endpoints=[
-    '/api/v2/resources/employees',
-    '/api/v1/employees',
-  ];
+
+  // URL fija de la Edge Function — no requiere configuración manual
+  const PROXY='https://lpxvatcwkerrrokrwwqt.supabase.co/functions/v1/factorial-proxy';
+
+  // Obtener el JWT de sesión actual para autenticar la llamada
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){
+    if(st){st.textContent='Error: no hay sesión activa. Inicia sesión primero.';st.className='sync-st err';}
+    return;
+  }
+
   let emps=[];let lastErr='';
+
+  // Probar endpoints v2 y v1
+  const endpoints=['employees'];
   for(const ep of endpoints){
     try{
-      const resp=await fetch(proxy+ep,{method:'GET',headers:{'Content-Type':'application/json'}});
-      if(!resp.ok){lastErr='HTTP '+resp.status+' en '+ep;continue;}
+      const resp=await fetch(`${PROXY}?endpoint=${ep}`,{
+        method:'GET',
+        headers:{
+          'Authorization':`Bearer ${session.access_token}`,
+          'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweHZhdGN3a2VycnJva3J3d3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTcwMDgsImV4cCI6MjA4OTU3MzAwOH0.or9l-I4qhwpcbQwuKYdeyJZbL-wauyExZmpEwPq7pcA'
+        }
+      });
+      if(!resp.ok){lastErr='HTTP '+resp.status;continue;}
       const data=await resp.json();
       const arr=Array.isArray(data)?data:(data.data||data.employees||data.resources||[]);
       if(arr.length){emps=arr;break;}
-      lastErr='Respuesta vacía en '+ep;
+      lastErr='Respuesta vacía';
     }catch(e){lastErr=e.message;}
   }
+
   if(!emps.length){
-    if(st){st.textContent='Error: '+lastErr;st.className='sync-st err';}return;
+    if(st){st.textContent='Error: '+lastErr;st.className='sync-st err';}
+    return;
   }
-  const team=loadT();let added=0,updated=0;
-  emps.forEach(e=>{
+
+  // Actualizar equipo en Supabase
+  let added=0,updated=0;
+  for(const e of emps){
     const first=(e.first_name||e.firstName||'').trim();
     const last=(e.last_name||e.lastName||'').trim();
-    const name=(first+' '+last).trim()||e.full_name||e.fullName||e.name||'';
-    if(!name)return;
+    const nombre=(first+' '+last).trim()||e.full_name||e.fullName||e.name||'';
+    if(!nombre)continue;
     const area=e.team||e.department||e.team_name||e.department_name||'Sin área';
-    const ex=team.find(p=>p.n===name);
-    if(ex){ex.on=true;ex.a=ex.a||area;updated++;}
-    else{team.push({n:name,a:area,nv:'N1',on:true});added++;}
-  });
-  saveT(team);rendTM();
+    const existing=C.pmap[nombre];
+    if(existing){
+      // Actualizar área si no tiene
+      if(!existing.a||existing.a==='Sin área'){
+        await savePersona_db({...existing,a:area});
+        updated++;
+      }
+    }else{
+      await savePersona_db({n:nombre,a:area,nv:'N1',on:true});
+      added++;
+    }
+  }
+
+  rendTM();
   if(st){
     st.textContent=`✓ Sincronizado: ${added} añadida${added!==1?'s':''}, ${updated} actualizada${updated!==1?'s':''} · ${emps.length} empleados en Factorial`;
     st.className='sync-st ok';
@@ -2704,7 +2722,17 @@ function openModal(type,idx){
     inner.innerHTML=`<div class="modal-t">Editar persona</div><label class="form-lbl">Nombre</label><input type="text" class="form-inp" id="ep-name" value="${p.n}"><label class="form-lbl">Área</label><select class="form-inp" id="ep-area"><option ${p.a==='Laboral'?'selected':''}>Laboral</option><option ${p.a==='Contable'?'selected':''}>Contable</option><option ${p.a==='Fiscal'?'selected':''}>Fiscal</option><option ${p.a==='Jurídica'?'selected':''}>Jurídica</option><option ${p.a==='Admin'?'selected':''}>Admin</option></select><label class="form-lbl">Nivel</label><select class="form-inp" id="ep-nv"><option ${p.nv==='N1'?'selected':''}>N1</option><option ${p.nv==='N2'?'selected':''}>N2</option><option ${p.nv==='N3'?'selected':''}>N3</option><option ${p.nv==='Admin'?'selected':''}>Admin</option></select><div style="display:flex;gap:8px;margin-top:4px"><button class="btn lt" style="flex:1;padding:10px;justify-content:center" onclick="closeModal()">Cancelar</button><button class="btn dk" style="flex:2;padding:10px;justify-content:center" onclick="editPerson(${idx})">Guardar</button></div>`;
   }
   if(type==='proxy-help'){
-    inner.innerHTML=`<div class="modal-t">Configurar proxy Cloudflare</div><div style="font-size:13px;color:var(--tx2);line-height:1.75;margin-bottom:14px"><b>3 pasos desde el terminal:</b><br><br><code style="background:var(--cream);padding:3px 7px;border-radius:4px;font-size:12px">npm install -g wrangler</code><br><code style="background:var(--cream);padding:3px 7px;border-radius:4px;font-size:12px">wrangler login</code><br><code style="background:var(--cream);padding:3px 7px;border-radius:4px;font-size:12px">wrangler secret put FACTORIAL_API_KEY</code><br><code style="background:var(--cream);padding:3px 7px;border-radius:4px;font-size:12px">wrangler deploy</code><br><br>La URL del Worker resultante es la que introduces aquí. La guía completa está en el archivo <b>DEPLOY.md</b> del paquete descargado.<br><br><b>Seguridad:</b> La API key de Factorial nunca aparece en el código ni en los logs — se guarda cifrada en Cloudflare.</div><button class="btn dk" style="width:100%;padding:10px;justify-content:center" onclick="closeModal()">Entendido</button>`;
+    inner.innerHTML=`<div class="modal-t">Integración con Factorial</div>
+    <div style="display:flex;align-items:center;gap:10px;background:rgba(216,165,95,0.08);border:1px solid rgba(216,165,95,0.2);border-radius:var(--r2);padding:12px 14px;margin-bottom:14px">
+      <svg width="16" height="16" fill="none" stroke="var(--oro)" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke-width="2"/><polyline points="22 4 12 14.01 9 11.01" stroke-width="2"/></svg>
+      <div style="font-size:12.5px;color:var(--tx2);line-height:1.5">Factorial está conectado automáticamente vía <strong style="color:var(--oro)">Supabase Edge Function</strong>. No requiere configuración adicional.</div>
+    </div>
+    <div style="font-size:12px;color:var(--tx2);line-height:1.9;margin-bottom:14px">
+      <div>✓ La API key está cifrada en Supabase Secrets</div>
+      <div>✓ Las llamadas se autentican con tu sesión</div>
+      <div>✓ Ningún dato sensible viaja al navegador</div>
+    </div>
+    <button class="btn dk" style="width:100%;padding:10px;justify-content:center" onclick="closeModal()">Entendido</button>`;
   }
 }
 
@@ -2755,20 +2783,30 @@ async function editPerson(i){
 // Ocultar app mientras verificamos sesión
 document.querySelector('.app').style.display='none';
 
-// Escuchar cambios de sesión (login, logout, callback de magic link)
+// Flag para evitar llamar initApp() más de una vez
+let _appInited=false;
+
 sb.auth.onAuthStateChange(async(event,session)=>{
-  if(session?.user){
+  if(session?.user && !_appInited){
+    _appInited=true;
+    // Limpiar el hash de la URL sin recargar la página
+    if(window.location.hash){
+      history.replaceState(null,'',window.location.pathname);
+    }
     await initApp(session.user);
-  } else {
+  } else if(!session && !_appInited){
     showLogin();
   }
 });
 
 // Verificar sesión existente al cargar
 (async()=>{
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session){showLogin();}
-  // Si hay sesión, onAuthStateChange la recoge automáticamente
+  // Dar tiempo a onAuthStateChange para procesar el hash del OAuth callback
+  await new Promise(r=>setTimeout(r,300));
+  if(!_appInited){
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session) showLogin();
+  }
 })();
 
 </script>
