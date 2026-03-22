@@ -6,6 +6,12 @@
 <title>PULSO BIPLAZA — Personas & Cultura</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// Fallback CDN si jsdelivr falla
+if(typeof supabase === 'undefined'){
+  document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>');
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 textarea,input,select{box-sizing:border-box;max-width:100%}
@@ -357,7 +363,7 @@ textarea:focus{outline:none;border-color:var(--oro);box-shadow:0 0 0 3px rgba(21
 <body>
 
 <!-- LOGIN SCREEN -->
-<div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--sb);z-index:9999;align-items:center;justify-content:center">
+<div id="login-screen" style="display:flex;position:fixed;inset:0;background:var(--sb);z-index:9999;align-items:center;justify-content:center">
   <div style="width:100%;max-width:420px;padding:24px">
     <div style="text-align:center;margin-bottom:32px">
       <div style="width:220px;margin:0 auto 16px;opacity:0.95">
@@ -1190,6 +1196,10 @@ const B2_PRIMERA={
 // ═══════════════════════════════════════════════════════════════════════════
 const SB_URL='https://lpxvatcwkerrrokrwwqt.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweHZhdGN3a2VycnJva3J3d3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTcwMDgsImV4cCI6MjA4OTU3MzAwOH0.or9l-I4qhwpcbQwuKYdeyJZbL-wauyExZmpEwPq7pcA';
+if(typeof supabase === 'undefined'){
+  document.getElementById('login-err') && (document.getElementById('login-err').textContent='Error: librería Supabase no cargó. Recarga la página.');
+  throw new Error('Supabase CDN failed to load');
+}
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3404,8 +3414,12 @@ const _isOAuthCallback = (function(){
 //  ARRANQUE — autenticación Supabase
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Ocultar app mientras verificamos sesión
-if (!_isOAuthCallback) document.querySelector('.app').style.display='none';
+// Login visible por defecto — se oculta en hideLogin() tras auth exitosa
+if (!_isOAuthCallback) {
+  // Asegurar que .app esté oculta hasta que initApp complete
+  const appEl = document.querySelector('.app');
+  if(appEl) appEl.style.display='none';
+}
 
 // Flag para evitar llamar initApp() más de una vez
 let _appInited=false;
