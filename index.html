@@ -8,7 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // Fallback CDN si jsdelivr falla
-_diag.log('2. Supabase CDN cargado: ' + (typeof supabase !== 'undefined'));
 if(typeof supabase === 'undefined'){
   document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>');
 }
@@ -441,7 +440,6 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
         Recibir enlace de acceso
       </button>
       <div id="login-err" style="font-size:12px;color:var(--redL);margin-top:8px;min-height:18px;text-align:center"></div>
-      <div id="login-diag" style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:12px;line-height:1.6;text-align:left;font-family:monospace;max-height:80px;overflow:auto"></div>
     </div>
 
     <!-- OTP confirm after email sent -->
@@ -989,18 +987,6 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
 </div>
 
 <script>
-// ── DIAGNÓSTICO DE CARGA ─────────────────────────────────────────────────────
-const _diag = {
-  steps: [],
-  log(msg){ 
-    this.steps.push(msg);
-    console.log('PULSO DIAG:', msg);
-    const el = document.getElementById('login-diag');
-    if(el) el.innerHTML = this.steps.map(s=>`<div>${s}</div>`).join('');
-  }
-};
-_diag.log('1. Script iniciado');
-
 // ── Error global para diagnóstico ────────────────────────────────────────────
 window.addEventListener('error', function(e){
   console.error('PULSO ERROR:', e.message, 'en', e.filename, 'línea', e.lineno);
@@ -1210,13 +1196,11 @@ const B2_PRIMERA={
 // ═══════════════════════════════════════════════════════════════════════════
 const SB_URL='https://lpxvatcwkerrrokrwwqt.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweHZhdGN3a2VycnJva3J3d3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTcwMDgsImV4cCI6MjA4OTU3MzAwOH0.or9l-I4qhwpcbQwuKYdeyJZbL-wauyExZmpEwPq7pcA';
-_diag.log('2. Supabase CDN cargado: ' + (typeof supabase !== 'undefined'));
 if(typeof supabase === 'undefined'){
   document.getElementById('login-err') && (document.getElementById('login-err').textContent='Error: librería Supabase no cargó. Recarga la página.');
   throw new Error('Supabase CDN failed to load');
 }
 const sb=supabase.createClient(SB_URL,SB_KEY);
-_diag.log('3. Supabase client creado');
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  CACHÉ EN MEMORIA — sustituye localStorage para datos de negocio
@@ -1480,8 +1464,7 @@ async function initApp(user){
   }
 
   console.log('PULSO: cargando dashboard...');
-  _diag.log('7. ¡hideLogin llamado! App cargando...');
-  hideLogin();
+    hideLogin();
   document.getElementById('tb-title').textContent='Dashboard';
   rendDB();
   rendQS();
@@ -3485,9 +3468,8 @@ function mostrarAccesoDenegado(email){
     </div>`;
 }
 
-_diag.log('4. Auth listener registrado');
 sb.auth.onAuthStateChange(async(event,session)=>{
-  _diag.log('5. Auth event: ' + event + ' session: ' + (session ? session.user?.email : 'none'));
+
   if(session?.user && !_appInited){
     const nombreCorto=await verificarAcceso(session.user);
     if(!nombreCorto){
@@ -3509,8 +3491,7 @@ sb.auth.onAuthStateChange(async(event,session)=>{
 // Verificar sesión existente al cargar — fallback robusto
 (async()=>{
   await new Promise(r=>setTimeout(r,500));
-  _diag.log('6. Fallback check - appInited: ' + _appInited);
-  if(_appInited) return;
+    if(_appInited) return;
   const {data:{session}}=await sb.auth.getSession();
   if(!session){ showLogin(); return; }
   // Hay sesión pero onAuthStateChange no disparó — inicializar manualmente
