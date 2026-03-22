@@ -807,7 +807,7 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
         <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;gap:6px;padding-bottom:2px" id="ay-tab-actions">
           <button class="btn lt" onclick="ayAll(true)">Expandir todo</button>
           <button class="btn lt" onclick="ayAll(false)">Contraer todo</button>
-          <a href="BIPLAZA_Guia_One_to_One.docx" download class="btn lt" style="text-decoration:none">Descargar</a>
+          <button class="btn lt" onclick="window.print()">Imprimir / PDF</button>
         </div>
       </div>
       <!-- Tab 1: Guión -->
@@ -817,7 +817,13 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
       <div style="background:var(--sb);border-radius:var(--r);padding:20px 24px;margin-bottom:16px">
         <div style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:5px">Guión estructurado · Uso interno</div>
         <div style="font-size:26px;font-weight:300;color:var(--wh);line-height:1.2">Guía de Reuniones <strong style="font-weight:600;color:var(--oro)">One to One</strong></div>
-        <div style="font-size:12.5px;color:rgba(255,255,255,0.38);margin-top:6px;font-style:italic">Guion estructurado para reuniones individuales con el equipo BIPLAZA</div>
+        <div style="font-size:12.5px;color:rgba(255,255,255,0.38);margin-top:6px;font-style:italic">Guión estructurado para reuniones individuales con el equipo BIPLAZA</div>
+        <div style="margin-top:10px">
+          <button onclick="cfgTabDesdeAY()" style="background:rgba(216,165,95,0.15);border:1px solid rgba(216,165,95,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--oro);cursor:pointer;font-family:var(--f);display:inline-flex;align-items:center;gap:5px">
+            <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke-width="2"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-width="2"/></svg>
+            Editar guión en Ajustes → Plantillas
+          </button>
+        </div>
         <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap" id="ay-hd-pills"></div>
       </div>
       <div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;margin-bottom:14px;border-left:4px solid var(--oro)">
@@ -2164,21 +2170,27 @@ function rendAY3(){
   // FAQs — lean, solo las realmente útiles
   const FAQS=[
     {q:'¿Con qué frecuencia debo hacer las sesiones?',
-     a:'90 días como máximo. Para personas N1 (en desarrollo), cada 45-60 días. El semáforo se pone en rojo a los 90 días — es tu señal de alerta. Programa siempre la próxima fecha antes de cerrar la sesión actual.'},
+     a:'90 días como máximo. Para personas N1, cada 45-60 días: están construyendo fundamentos y necesitan feedback más frecuente. El semáforo se pone en rojo a los 90 días. Programa siempre la próxima fecha antes de cerrar la sesión actual — con un horario fijado es mucho más fácil mantener la cadencia.'},
     {q:'¿La app detecta si es la primera sesión con una persona?',
      a:'Sí. Si no hay ninguna sesión registrada, el bloque B2 cambia automáticamente al guión de primera sesión: contrato de confianza, trayectoria, situación actual y desarrollo. No tienes que seleccionar nada.'},
     {q:'¿Cómo funciona el semáforo de calidad?',
-     a:'Verde: sesión en los últimos 90 días con compromisos registrados. Ámbar: sesión en los últimos 90 días sin compromisos, o entre 60-90 días. Rojo: más de 90 días o sin sesiones. Depende de dos factores: frecuencia y compromisos.'},
+     a:'Verde: sesión en los últimos 90 días con compromisos registrados. Ámbar: sesión en los últimos 90 días sin compromisos, o entre 60-90 días sin sesión. Rojo: más de 90 días o sin sesiones registradas. Se calcula desde dos factores: frecuencia y calidad (compromisos).'},
     {q:'¿Puedo volver a un bloque anterior durante la sesión?',
-     a:'Sí. El panel derecho muestra los 5 bloques como pasos navegables. Los completados aparecen en verde y puedes hacer clic para volver. El contenido que hayas escrito no se pierde.'},
+     a:'Sí. El panel lateral muestra los 5 bloques como pasos navegables. Los completados aparecen marcados y puedes hacer clic para volver. El contenido escrito no se pierde.'},
     {q:'¿Qué pasa si no da tiempo a completar todos los bloques?',
-     a:'Guarda igualmente con lo que tengas. Una sesión parcial registrada es mejor que una sesión completa no registrada. Aparecerá como "Parcial" en el historial.'},
+     a:'Guarda con lo que tengas. Una sesión parcial registrada es mejor que una sesión completa no registrada. Aparecerá como «Parcial» en el historial.'},
     {q:'¿Los compromisos del responsable son vinculantes?',
-     a:'Sí, igual que los del colaborador/a. Si el equipo percibe que los compromisos del responsable no se cumplen, el sistema pierde credibilidad en 2-3 sesiones. Revísalos siempre antes de la siguiente sesión.'},
+     a:'Sí, exactamente igual que los del colaborador/a. Si el equipo percibe que los compromisos del responsable no se cumplen, el modelo CFR pierde credibilidad en 2-3 sesiones. Beni te los recuerda siempre antes de cada sesión.'},
     {q:'¿Dónde se guardan los datos?',
-     a:'En el localStorage de tu navegador — en tu dispositivo, sin servidor externo. Los datos son privados y solo accesibles desde el mismo navegador. Si cambias de navegador o dispositivo, los datos no se transfieren automáticamente.'},
+     a:'En Supabase — base de datos en la nube segura con cifrado en reposo, accesible desde cualquier dispositivo con tu cuenta BIPLAZA. Los datos de cada persona solo son visibles para los usuarios autorizados de PULSO. Puedes exportar un backup completo en JSON desde Ajustes → Datos.'},
+    {q:'¿Puedo personalizar el guión del One-to-One?',
+     a:'Sí. Ve a Ajustes → Plantillas → One-to-One. Puedes editar el texto de las preguntas de cada bloque, añadir nuevas o eliminar las que no uses. Cada modificación crea una nueva versión con historial completo: quién lo cambió, cuándo y qué modificó. Puedes restaurar cualquier versión anterior.'},
+    {q:'¿Para qué sirve la conexión con Outlook?',
+     a:'Para dos cosas concretas: antes de programar una sesión, PULSO consulta la disponibilidad en el calendario (solo libre/ocupado, sin ver los detalles de los eventos) para evitar conflictos. Al guardar una sesión programada con hora, crea automáticamente el evento en Outlook y envía la invitación al colaborador/a. Se conecta desde Ajustes → Factorial → Calendario Outlook.'},
     {q:'¿Es obligatorio sincronizar con Factorial?',
-     a:'No. Puedes gestionar el equipo manualmente desde Gestionar equipo. La sincronización con Factorial es opcional y requiere configurar un proxy de Cloudflare Worker para proteger la API key.'},
+     a:'No. Puedes gestionar el equipo manualmente desde la sección Gestionar equipo. La sincronización con Factorial es opcional: está preconfigurada vía Supabase Edge Function, sin necesidad de configuración adicional. Actualiza nombres, emails, departamentos y contratos del equipo.'},
+    {q:'¿Qué hace Beni exactamente?',
+     a:'Beni es el copiloto de IA de PULSO. Está disponible en el botón ✦ de la esquina inferior derecha. Puede preparar el briefing antes de una sesión, analizar la sesión al guardarla, revisar compromisos pendientes, redactar el email de seguimiento, analizar la trayectoria de una persona a lo largo del tiempo, detectar señales de riesgo en el equipo y mucho más. Beni conoce BIPLAZA, su calendario fiscal y la metodología CFR.'},
   ];
 
   let h=`<div style="max-width:760px">`;
@@ -2993,7 +3005,7 @@ async function syncFactorial(){
 // ═══════════════════════════════════════════════════════════════════════════
 function rendAY(){
   // Header pills
-  const pills=[['30–45 min','Duración'],['Trimestral','Ciclo'],['Individual · Privado','Formato'],['Doble feedback','Tipo']];
+  const pills=[['30–45 min','Duración'],['Cada 45-90 días','Ciclo'],['Individual · Privado','Formato'],['Doble feedback','Tipo']];
   document.getElementById('ay-hd-pills').innerHTML=pills.map(([t])=>`<div style="background:rgba(216,165,95,0.12);border:1px solid rgba(216,165,95,0.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;color:var(--oro)">${t}</div>`).join('');
 
   // Structure overview
@@ -3056,11 +3068,17 @@ function rendAY(){
 
   // Tips
   const tips=[
-    {t:'Antes',items:['Revisa Necesidades de Formación 2025','Consulta la matriz de competencias','Repasa compromisos de la sesión anterior','Prepara un reconocimiento concreto y un ejemplo de mejora']},
-    {t:'Durante',items:['El colaborador/a habla el 60% del tiempo','Empieza el B3 siempre por el reconocimiento','Sé específico: hechos, no impresiones','No improvises el Feedback Wrap']},
-    {t:'Después',items:['Envía resumen con compromisos en 24–48h','Actualiza la ficha de formación si aplica','Cumple tus compromisos antes de la siguiente sesión']}
+    {t:'Antes',items:['Revisa el historial y los compromisos de la sesión anterior','Prepara un reconocimiento concreto y un ejemplo de mejora','Consulta la DPT y el nivel de la persona','Programa la sesión con tiempo — usa PULSO para verificar disponibilidad']},
+    {t:'Durante',items:['La persona habla el 60% del tiempo — escucha más que hablas','Empieza el B3 siempre por el reconocimiento genuino','Sé específico: hechos y observaciones, no impresiones generales','No improvises el Feedback Wrap — construye cada parte']},
+    {t:'Después',items:['Envía el resumen con compromisos en 24–48h — incluye los tuyos','Actualiza la ficha si hay cambios en el puesto o el desarrollo','Cumple tus compromisos antes de la siguiente sesión — el equipo observa']}
   ];
   document.getElementById('ay-tips').innerHTML=tips.map(tip=>`<div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden"><div style="background:var(--sb);padding:10px 14px;font-size:10px;font-weight:700;color:var(--oro);text-transform:uppercase;letter-spacing:0.7px">${tip.t}</div><div style="padding:12px 14px">${tip.items.map(x=>`<div style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--cD);font-size:12.5px;color:var(--tx2);line-height:1.5"><div style="width:5px;height:5px;border-radius:50%;background:var(--oro);flex-shrink:0;margin-top:7px"></div>${x}</div>`).join('')}</div></div>`).join('');
+}
+
+// Abre Ajustes directamente en la pestaña Plantillas → sub-tab OTO
+function cfgTabDesdeAY(){
+  openSettings();
+  setTimeout(()=>{ cfgTab(3); setTimeout(()=>pvTab(1), 50); }, 100);
 }
 
 function ayTog(bid){
