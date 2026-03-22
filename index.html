@@ -919,6 +919,14 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
           <div>✓ Ausencias y vacaciones</div>
           <div>✓ Asistencia y fichajes</div>
         </div>
+
+        <div class="divider" style="margin:20px 0"></div>
+
+        <!-- Outlook Calendar -->
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px">Calendario Outlook</div>
+        <div id="outlook-cfg-content">
+          <div style="font-size:12px;color:var(--tx3)">Cargando estado...</div>
+        </div>
       </div>
 
       <!-- TAB 3: Plantillas -->
@@ -956,6 +964,7 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
 </div>
 <style>
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 #cfg-bg{display:none}
 #cfg-bg.open{display:flex}
 </style>
@@ -1143,12 +1152,13 @@ const K={A:'pb6_areas'};
 const C={
   team:[],        // personas de Supabase [{id,n,a,nv,on}]
   hist:[],        // sesiones de Supabase (formato app)
-  prog:[],        // programaciones [{persona,fecha}]
+  prog:[],        // programaciones [{persona,fecha,hora,id}]
   notes:{},       // notas permanentes {nombre: texto}
   mm:{},          // moving motivators {nombre: {datos,fecha}}
   user:null,      // usuario autenticado actual
   pmap:{},        // mapa nombre→{id,...} para FK lookups
-  nombreUsuario:null // nombre corto del usuario activo (Leti, Pablo, Gusti...)
+  nombreUsuario:null, // nombre corto del usuario activo (Leti, Pablo, Gusti...)
+  outlook:{connected:false,email:null,displayName:null} // estado conexión Outlook
 };
 
 // Convertir fila de Supabase → formato interno de la app
@@ -1221,14 +1231,23 @@ async function saveH_db(sesObj){
   return data;
 }
 
-async function saveP_db(persona,fecha){
+async function saveP_db(persona,fecha,hora=null){
   const pid=C.pmap[persona]?.id;
-  if(!pid)return;
-  const {error}=await sb.from('programaciones').upsert({persona_id:pid,fecha},{onConflict:'persona_id,fecha'});
+  if(!pid)return null;
+  const payload={persona_id:pid,fecha};
+  if(hora) payload.hora=hora;
+  const {data,error}=await sb.from('programaciones')
+    .upsert(payload,{onConflict:'persona_id,fecha'})
+    .select('id').single();
   if(!error){
     if(!C.prog.find(x=>x.persona===persona&&x.fecha===fecha))
-      C.prog.push({persona,fecha});
+      C.prog.push({persona,fecha,hora,id:data?.id});
+    else{
+      const e=C.prog.find(x=>x.persona===persona&&x.fecha===fecha);
+      if(e){e.hora=hora;e.id=data?.id;}
+    }
   }
+  return data?.id||null;
 }
 
 async function deleteP_db(persona,fecha){
@@ -1273,7 +1292,7 @@ async function toggleOn_db(nombre){
 
 // Compatibilidad: loadP necesita formato {persona,fecha}
 function loadP(){
-  return C.prog.map(x=>({persona:x.persona,fecha:x.fecha}));
+  return C.prog.map(x=>({persona:x.persona,fecha:x.fecha,hora:x.hora||null,outlook_status:x.outlook_status||'none',id:x.id}));
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1351,7 +1370,14 @@ async function initApp(user){
     const {data:progs}=await sb.from('programaciones').select('*').order('fecha');
     C.prog=(progs||[]).map(row=>{
       const p=Object.values(C.pmap).find(x=>x.id===row.persona_id);
-      return{persona:p?p.n:'?',fecha:row.fecha,_id:row.id};
+      return{
+        persona:p?p.n:'?',
+        fecha:row.fecha,
+        hora:row.hora||null,
+        outlook_status:row.outlook_status||'none',
+        outlook_event_id:row.outlook_event_id||null,
+        id:row.id
+      };
     });
 
     // 4. Notas permanentes
@@ -1381,6 +1407,8 @@ async function initApp(user){
   setTimeout(()=>facDetectarCambios(), 2000);
   // ── Cargar plantilla OTO activa (puede haber sido modificada desde BD) ───
   pvCargarPlantillaActiva();
+  // ── Inicializar estado Outlook ─────────────────────────────────────────────
+  outlookInit();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1469,6 +1497,7 @@ function cfgTab(n){
     if(c)c.style.display=on?'block':'none';
   });
   if(n===1)updateStorageInfo();
+  if(n===2)outlookRendCfg();
   if(n===3){pvTab(1);}
 }
 
@@ -2758,7 +2787,11 @@ function rendCal(){
     const iso=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isT=dt.getTime()===now.getTime();
     const evts=prog.filter(p=>p.fecha===iso);
-    let evH=evts.map(e=>`<div class="cal-ev" onclick="quickStart('${e.persona}')">${e.persona.split(' ')[0]}</div>`).join('');
+    let evH=evts.map(e=>{
+      const horaStr=e.hora?`<span style="font-size:9px;opacity:0.7;margin-left:4px">${e.hora.slice(0,5)}</span>`:'';
+      const olBadge=e.outlook_status&&e.outlook_status!=='none'?`<span style="margin-left:3px">${{creating:'🕐',created:'📅',accepted:'✓',declined:'✗',error:'⚠'}[e.outlook_status]||''}</span>`:'';
+      return `<div class="cal-ev" onclick="quickStart('${e.persona}')">${e.persona.split(' ')[0]}${horaStr}${olBadge}</div>`;
+    }).join('');
     html+=`<div class="cal-day${isT?' today':''}"><div class="cal-dn">${d}</div>${evH}</div>`;
   }
   document.getElementById('cal-grid').innerHTML=html;
@@ -2770,7 +2803,13 @@ function rendCal(){
   const up=prog.filter(x=>x.fecha>=today).sort((a,b)=>a.fecha.localeCompare(b.fecha));
   const upEl=document.getElementById('cal-up');
   if(!up.length)upEl.innerHTML='<div class="empty">Sin sesiones programadas</div>';
-  else upEl.innerHTML=up.slice(0,8).map(x=>{const d=daysBetween(today,x.fecha);return `<div class="al-row"><div class="al-info"><div class="al-name">${x.persona}</div><div class="al-meta">${fmtD(x.fecha)}</div></div><span style="font-size:11px;font-weight:700;color:${d===0?'var(--red)':d<=7?'var(--amb)':'var(--oroD)'}">${d===0?'Hoy':d+'d'}</span><button class="btn dk" style="font-size:11px;padding:4px 10px" onclick="quickStart('${x.persona}')">Iniciar</button></div>`;}).join('');
+  else upEl.innerHTML=up.slice(0,8).map(x=>{
+    const d=daysBetween(today,x.fecha);
+    const horaLabel=x.hora?` · ${x.hora.slice(0,5)}`:'';
+    const olIcon={creating:'🕐',created:'📅',accepted:'✓',declined:'✗',error:'⚠'}[x.outlook_status]||'';
+    const olBadge=olIcon?` <span title="Outlook: ${x.outlook_status}">${olIcon}</span>`:'';
+    return `<div class="al-row"><div class="al-info"><div class="al-name">${x.persona}${olBadge}</div><div class="al-meta">${fmtD(x.fecha)}${horaLabel}</div></div><span style="font-size:11px;font-weight:700;color:${d===0?'var(--red)':d<=7?'var(--amb)':'var(--oroD)'}">${d===0?'Hoy':d+'d'}</span><button class="btn dk" style="font-size:11px;padding:4px 10px" onclick="quickStart('${x.persona}')">Iniciar</button></div>`;
+  }).join('');
   // Overdue
   const ls=getLS();
   const ov=loadT().filter(p=>p.on).filter(p=>{const s=ls[p.n];return !s||daysSince(s.f)>90;}).sort((a,b)=>(ls[b.n]?daysSince(ls[b.n].f)||9999:9999)-(ls[a.n]?daysSince(ls[a.n].f)||9999:9999));
@@ -2836,6 +2875,9 @@ async function getSessionToken(){
 
 const FAC_PROXY='https://lpxvatcwkerrrokrwwqt.supabase.co/functions/v1/factorial-proxy';
 const FAC_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweHZhdGN3a2VycnJva3J3d3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5OTcwMDgsImV4cCI6MjA4OTU3MzAwOH0.or9l-I4qhwpcbQwuKYdeyJZbL-wauyExZmpEwPq7pcA';
+const OUTLOOK_PROXY = 'https://lpxvatcwkerrrokrwwqt.supabase.co/functions/v1/outlook-proxy';
+const AZURE_CLIENT  = '10e450f9-e880-4166-8ee2-bf31f4ed59cf';
+const AZURE_TENANT  = '76026b37-0e1b-4c67-a198-530d66f8884d';
 
 async function facCall(endpoint, params={}){
   const qs=new URLSearchParams({endpoint,...params}).toString();
@@ -3168,7 +3210,26 @@ function openModal(type,idx){
   bg.classList.add('open');
   if(type==='prog'){
     const team=loadT().filter(p=>p.on);
-    inner.innerHTML=`<div class="modal-t">Programar sesión</div><label class="form-lbl">Persona</label><select class="form-inp" id="modal-p">${team.map(p=>`<option value="${p.n}">${p.n} — ${p.a}</option>`).join('')}</select><label class="form-lbl">Fecha</label><input type="date" class="form-inp" id="modal-f" value="${td()}"><div style="display:flex;gap:8px;margin-top:4px"><button class="btn lt" style="flex:1;padding:10px;justify-content:center" onclick="closeModal()">Cancelar</button><button class="btn dk" style="flex:2;padding:10px;justify-content:center" onclick="saveProg()">Guardar</button></div>`;
+    inner.innerHTML=`<div class="modal-t">Programar sesión</div>
+  <label class="form-lbl">Persona</label>
+  <select class="form-inp" id="modal-p" onchange="outlookCheckDisp()">${team.map(p=>`<option value="${p.n}">${p.n} — ${p.a}</option>`).join('')}</select>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div>
+      <label class="form-lbl">Fecha</label>
+      <input type="date" class="form-inp" id="modal-f" value="${td()}" onchange="outlookCheckDisp()">
+    </div>
+    <div>
+      <label class="form-lbl">Hora <span style="font-weight:400;color:var(--tx3)">(opcional)</span></label>
+      <input type="time" class="form-inp" id="modal-hora" value="10:00" onchange="outlookCheckDisp()">
+    </div>
+  </div>
+  <div id="modal-freebusy" style="min-height:32px;margin:8px 0 4px"></div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn lt" style="flex:1;padding:10px;justify-content:center" onclick="closeModal()">Cancelar</button>
+    <button class="btn dk" style="flex:2;padding:10px;justify-content:center" onclick="saveProg()">Guardar</button>
+  </div>`;
+  // Check free/busy after modal renders
+  setTimeout(outlookCheckDisp, 200);
   }
   if(type==='add-p'){
     inner.innerHTML=`<div class="modal-t">Añadir persona</div><label class="form-lbl">Nombre</label><input type="text" class="form-inp" id="p-name" placeholder="Nombre Apellido"><label class="form-lbl">Área</label><select class="form-inp" id="p-area"><option>Laboral</option><option>Contable</option><option>Fiscal</option><option>Jurídica</option><option>Admin</option></select><label class="form-lbl">Nivel</label><select class="form-inp" id="p-nv"><option>N1</option><option>N2</option><option>N3</option><option>Admin</option></select><div style="display:flex;gap:8px;margin-top:4px"><button class="btn lt" style="flex:1;padding:10px;justify-content:center" onclick="closeModal()">Cancelar</button><button class="btn dk" style="flex:2;padding:10px;justify-content:center" onclick="addPerson()">Añadir</button></div>`;
@@ -3213,9 +3274,20 @@ function openModalForP(name){
 async function saveProg(){
   const p=document.getElementById('modal-p').value;
   const f=document.getElementById('modal-f').value;
+  const h=document.getElementById('modal-hora')?.value||null;
   if(!p||!f)return;
-  await saveP_db(p,f);
+
+  // Deshabilitar botón mientras guarda
+  const btn=document.querySelector('[onclick="saveProg()"]');
+  if(btn){btn.disabled=true;btn.textContent='Guardando...';}
+
+  const progId=await saveP_db(p,f,h);
   closeModal();rendCal();rendDB();
+
+  // Si Outlook conectado y hay hora, crear evento en segundo plano
+  if(progId && h && C.outlook?.connected){
+    outlookCrearEvento(p,f,h,progId).catch(()=>{});
+  }
 }
 
 async function addPerson(){
@@ -3244,11 +3316,28 @@ async function editPerson(i){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+//  OAUTH CALLBACK — detectar si somos popup de Microsoft
+// ═══════════════════════════════════════════════════════════════════════════
+const _isOAuthCallback = (function(){
+  try {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('state') === 'outlook_auth' && window.opener) {
+      const msg = { type: 'outlook_auth_code', code: p.get('code'), error: p.get('error') };
+      window.opener.postMessage(msg, window.location.origin);
+      document.body.innerHTML = '<div style="font-family:sans-serif;padding:40px;text-align:center;color:#555">Conectando con Outlook…<br><small>Esta ventana se cerrará sola.</small></div>';
+      setTimeout(() => window.close(), 1500);
+      return true;
+    }
+  } catch(e) {}
+  return false;
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
 //  ARRANQUE — autenticación Supabase
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Ocultar app mientras verificamos sesión
-document.querySelector('.app').style.display='none';
+if (!_isOAuthCallback) document.querySelector('.app').style.display='none';
 
 // Flag para evitar llamar initApp() más de una vez
 let _appInited=false;
@@ -4398,6 +4487,238 @@ async function dpGuardar(id){
 
 
 // ═══════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  OUTLOOK CALENDAR — Integración focalizada (free/busy + crear evento)
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function outlookProxy(action, body={}) {
+  const { data:{ session } } = await sb.auth.getSession();
+  const jwt = session?.access_token || '';
+  const resp = await fetch(
+    'https://lpxvatcwkerrrokrwwqt.supabase.co/functions/v1/outlook-proxy',
+    {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${jwt}` },
+      body: JSON.stringify({ action, ...body })
+    }
+  );
+  return resp.json();
+}
+
+// ── Inicializar: comprobar si el usuario ya tiene token guardado ─────────────
+async function outlookInit() {
+  try {
+    const res = await outlookProxy('status');
+    if (res.connected || res.email) {
+      C.outlook = { connected: true, email: res.email, displayName: res.display_name };
+    }
+  } catch(e) {
+    // Sin conexión — estado por defecto
+  }
+  // Escuchar callback OAuth (popup)
+  window.addEventListener('message', async (evt) => {
+    if (evt.origin !== window.location.origin) return;
+    if (evt.data?.type !== 'outlook_auth_code') return;
+    if (evt.data.error) {
+      outlookRendCfg('error', evt.data.error);
+      return;
+    }
+    await outlookFinalizarAuth(evt.data.code);
+  });
+  outlookRendCfg();
+}
+
+// ── Render del bloque Outlook en Ajustes ─────────────────────────────────────
+function outlookRendCfg(estado='', msg='') {
+  const el = document.getElementById('outlook-cfg-content');
+  if (!el) return;
+
+  if (estado === 'connecting') {
+    el.innerHTML = `<div style="font-size:12px;color:var(--tx3);display:flex;align-items:center;gap:8px">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-9-9" stroke-width="2"/></svg>
+      Conectando con Microsoft...</div>`;
+    return;
+  }
+  if (estado === 'error') {
+    el.innerHTML = `<div style="font-size:12px;color:var(--red);margin-bottom:10px">⚠ Error: ${msg}</div>
+      <button class="btn lt" style="font-size:12px" onclick="outlookConectar()">Reintentar</button>`;
+    return;
+  }
+
+  if (C.outlook?.connected) {
+    el.innerHTML = `
+      <div style="background:rgba(216,165,95,0.08);border:1px solid rgba(216,165,95,0.2);border-radius:var(--r2);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <svg width="16" height="16" fill="none" stroke="var(--oro)" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke-width="2"/><polyline points="22 4 12 14.01 9 11.01" stroke-width="2"/></svg>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--tx)">Conectado como ${C.outlook.displayName||C.outlook.email}</div>
+          <div style="font-size:11px;color:var(--tx3)">${C.outlook.email}</div>
+        </div>
+      </div>
+      <div style="font-size:11.5px;color:var(--tx2);line-height:1.7;margin-bottom:12px">
+        ✓ Consulta de disponibilidad al programar OTOs<br>
+        ✓ Creación automática de eventos con invitación<br>
+        ✓ Estado de confirmación visible en el calendario
+      </div>
+      <button style="background:none;border:1px solid var(--cD);border-radius:var(--r2);padding:6px 12px;font-size:11px;color:var(--tx3);cursor:pointer;font-family:var(--f)"
+        onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'"
+        onmouseout="this.style.borderColor='var(--cD)';this.style.color='var(--tx3)'"
+        onclick="outlookDesconectar()">Desconectar Outlook</button>`;
+  } else {
+    el.innerHTML = `
+      <div style="font-size:12px;color:var(--tx3);line-height:1.6;margin-bottom:14px">
+        Conecta tu cuenta de BIPLAZA para consultar disponibilidad al programar sesiones y crear eventos automáticamente en los calendarios de ambas partes.
+      </div>
+      <button class="btn go" style="font-size:12px" onclick="outlookConectar()">
+        <svg width="13" height="13" viewBox="0 0 21 21" fill="currentColor"><path d="M0 0h10v10H0zm11 0h10v10H11zM0 11h10v10H0zm11 11h10v10H11z" opacity=".8"/></svg>
+        Conectar con Microsoft 365
+      </button>
+      <div style="font-size:11px;color:var(--tx4);margin-top:8px">Solo se solicitan permisos de calendario. Tus emails no son accesibles.</div>`;
+  }
+}
+
+// ── Iniciar flujo OAuth PKCE ──────────────────────────────────────────────────
+async function outlookConectar() {
+  outlookRendCfg('connecting');
+  const redirectUri = window.location.origin + window.location.pathname;
+
+  // Generar code_verifier y code_challenge (PKCE)
+  const verifier = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+    .map(b => b.toString(16).padStart(2,'0')).join('');
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  const challenge = btoa(String.fromCharCode(...new Uint8Array(hash)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+
+  sessionStorage.setItem('outlook_verifier', verifier);
+  sessionStorage.setItem('outlook_redirect', redirectUri);
+
+  const params = new URLSearchParams({
+    client_id:     '10e450f9-e880-4166-8ee2-bf31f4ed59cf',
+    response_type: 'code',
+    redirect_uri:  redirectUri,
+    scope:         'Calendars.ReadWrite Calendars.Read.Shared offline_access User.Read',
+    state:         'outlook_auth',
+    code_challenge: challenge,
+    code_challenge_method: 'S256',
+    prompt:        'select_account'
+  });
+
+  const authUrl = `https://login.microsoftonline.com/76026b37-0e1b-4c67-a198-530d66f8884d/oauth2/v2.0/authorize?${params}`;
+  const popup = window.open(authUrl, 'outlook_auth', 'width=520,height=620,left=200,top=100');
+  if (!popup) {
+    outlookRendCfg('error', 'El navegador bloqueó la ventana emergente. Permite los popups para este sitio.');
+  }
+}
+
+// ── Finalizar OAuth: enviar code al proxy ─────────────────────────────────────
+async function outlookFinalizarAuth(code) {
+  outlookRendCfg('connecting');
+  const verifier     = sessionStorage.getItem('outlook_verifier') || '';
+  const redirect_uri = sessionStorage.getItem('outlook_redirect') || window.location.origin + window.location.pathname;
+  sessionStorage.removeItem('outlook_verifier');
+  sessionStorage.removeItem('outlook_redirect');
+
+  const res = await outlookProxy('auth-exchange', { code, code_verifier: verifier, redirect_uri });
+  if (res.error) {
+    outlookRendCfg('error', res.error);
+    return;
+  }
+  C.outlook = { connected: true, email: res.email, displayName: res.display_name };
+  outlookRendCfg();
+}
+
+// ── Desconectar ───────────────────────────────────────────────────────────────
+async function outlookDesconectar() {
+  if (!confirm('¿Desconectar Outlook? Los eventos ya creados no se eliminarán.')) return;
+  await outlookProxy('disconnect');
+  C.outlook = { connected: false, email: null, displayName: null };
+  outlookRendCfg();
+}
+
+// ── Free/busy check al programar ──────────────────────────────────────────────
+let _fbDebounce = null;
+async function outlookCheckDisp() {
+  if (!C.outlook?.connected) return;
+  clearTimeout(_fbDebounce);
+  _fbDebounce = setTimeout(async () => {
+    const persona = document.getElementById('modal-p')?.value;
+    const fecha   = document.getElementById('modal-f')?.value;
+    const hora    = document.getElementById('modal-hora')?.value;
+    const fbEl    = document.getElementById('modal-freebusy');
+    if (!fbEl || !persona || !fecha || !hora) return;
+
+    fbEl.innerHTML = `<div style="font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:6px">
+      <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-9-9" stroke-width="2"/></svg>
+      Comprobando disponibilidad...</div>`;
+
+    // Hora fin = hora inicio + 1h
+    const [hh, mm] = hora.split(':').map(Number);
+    const finMin = mm;
+    const finH = hh + 1;
+    const horaFin = `${String(finH).padStart(2,'0')}:${String(finMin).padStart(2,'0')}`;
+
+    // Emails a consultar: el del usuario activo siempre, el del colaborador si tiene email
+    const emailsToCheck = [C.outlook.email];
+    const personaData = C.pmap[persona];
+    if (personaData?.email) emailsToCheck.push(personaData.email);
+
+    const res = await outlookProxy('free-busy', {
+      emails: emailsToCheck, fecha, hora_inicio: hora, hora_fin: horaFin
+    });
+
+    if (res.error) {
+      fbEl.innerHTML = '';
+      return;
+    }
+
+    const resultados = res.schedules || [];
+    const miEstado      = resultados.find(s => s.email === C.outlook.email);
+    const colaborEstado = emailsToCheck.length > 1 ? resultados.find(s => s.email !== C.outlook.email) : null;
+
+    let html = '';
+    const renderLinea = (label, estado) => {
+      if (!estado) return '';
+      const color = estado.status === 'free' ? 'var(--ok)' : estado.status === 'tentative' ? 'var(--amb)' : 'var(--red)';
+      const icon  = estado.status === 'free' ? '✓' : estado.status === 'tentative' ? '~' : '✗';
+      const texto = estado.status === 'free' ? 'Disponible' : estado.status === 'tentative' ? 'Tentativo' : 'Ocupado';
+      return `<span style="font-size:11.5px;color:${color};margin-right:12px">${icon} ${label}: ${texto}</span>`;
+    };
+
+    html = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:6px 10px;background:var(--cream);border-radius:var(--r2);border:1px solid var(--cD)">
+      ${renderLinea('Tú', miEstado)}
+      ${colaborEstado ? renderLinea(persona.split(' ')[0], colaborEstado) : ''}
+    </div>`;
+
+    fbEl.innerHTML = html;
+  }, 400);
+}
+
+// ── Crear evento tras guardar programación ────────────────────────────────────
+async function outlookCrearEvento(persona, fecha, hora, progId) {
+  if (!C.outlook?.connected || !hora) return;
+
+  const [hh, mm] = hora.split(':').map(Number);
+  const horaFin = `${String(hh+1).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+  const personaData = C.pmap[persona];
+  const personaEmail = personaData?.email || null;
+
+  const res = await outlookProxy('create-event', {
+    persona_nombre:    persona,
+    persona_email:     personaEmail,
+    fecha, hora_inicio: hora, hora_fin: horaFin,
+    prog_id:           progId,
+    responsable_nombre: C.nombreUsuario || ''
+  });
+
+  if (res.success) {
+    // Actualizar badge en calendario
+    const entry = C.prog.find(x => x.id === progId);
+    if (entry) entry.outlook_status = personaEmail ? 'creating' : 'created';
+    rendCal();
+  }
+}
 
 const BENI_URL='https://lpxvatcwkerrrokrwwqt.supabase.co/functions/v1/beni';
 let _beniOpen=false;
