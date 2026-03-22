@@ -1007,104 +1007,134 @@ const MM_D=[
 ];
 
 const BLOQUES=[
+  // ─────────────────────────────────────────────────────────────────────────
+  // B1 · BIENVENIDA Y CONEXIÓN · 5 min
+  // ─────────────────────────────────────────────────────────────────────────
   {num:1,t:'Bienvenida y conexión',min:5,
-   hint:'Empieza con algo personal antes de entrar en temas de trabajo.',
-   rows:[{tag:'Bienestar',txt:'«Tengo ganas de saber cómo te encuentras estas semanas.»',lit:1},
-         {tag:'Personal',txt:'«Si hay algo del plano personal que quieras compartir, este es un espacio para ello.»',lit:1},
-         {tag:'Carga',txt:'«Me interesa cómo estás viviendo el ritmo de trabajo últimamente.»',lit:1}],nh:3},
+   hint:'Empieza por la persona, no por el trabajo. La calidad de lo que viene después depende de lo que construyas aquí en los primeros 2-3 minutos.',
+   rows:[
+     {tag:'Estado real',   txt:'«Antes de entrar en el trabajo: ¿cómo estás tú? No lo laboral, tú.»',lit:1},
+     {tag:'Esta semana',   txt:'«¿Qué tal ha ido esta semana? ¿Algo que te haya pesado o que te haya dado energía?»',lit:1},
+     {tag:'Fuera del trabajo', txt:'«¿Hay algo del plano personal o del contexto que influya en cómo estás llegando hoy?»',lit:1}
+   ],nh:3},
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // B2 · FEEDBACK DEL COLABORADOR/A · 10 min
+  // ─────────────────────────────────────────────────────────────────────────
   {num:2,t:'Feedback del colaborador/a',min:10,
-   hint:'Escucha. El colaborador/a habla el 60% del tiempo. No interrumpas.',
+   hint:'Tu trabajo aquí es escuchar. La persona habla el 60% del tiempo. Haz una pregunta y espera — no rellenes el silencio.',
    subs:[
-    {s:'2.1 Tareas y proyectos',rows:[
-      {tag:'Logros',txt:'«Me gustaría que me cuentes qué has conseguido desde que nos vimos.»',lit:1},
-      {tag:'Retos',txt:'«Tengo curiosidad por saber qué es lo que más te ha costado este período.»',lit:1},
-      {tag:'Eficiencia',txt:'¿Hay tareas que sientes que no aportan valor o que podrían hacerse mejor?',lit:0},
-      {tag:'Prioridades',txt:'¿Tienes claro cuáles son tus prioridades para las próximas semanas?',lit:0}]},
-    {s:'2.2 Procesos y herramientas',rows:[
-      {tag:'Procesos',txt:'¿Hay algún proceso que crees que se puede mejorar en tu área?',lit:0},
-      {tag:'Bitrix',txt:'«Cuéntame cómo está funcionando Bitrix en tu día a día.»',lit:1},
-      {tag:'Recursos',txt:'¿Necesitas alguna herramienta o recurso que no tienes actualmente?',lit:0},
-      {tag:'Comunicación',txt:'¿Sientes que la comunicación interna funciona bien?',lit:0}]},
-    {s:'2.3 Clima laboral',rows:[
-      {tag:'Clima',txt:'¿Cómo valorarías el ambiente en tu equipo del 1 al 10?',lit:0},
-      {tag:'Apoyo',txt:'¿Te sientes apoyado/a por tus compañeros y por la dirección?',lit:0},
-      {tag:'Bienestar',txt:'¿Hay algo que te genere incomodidad o estrés en el entorno laboral?',lit:0},
-      {tag:'Positivo',txt:'¿Qué es lo que más valoras del equipo actualmente?',lit:0}]}
+    {s:'Trabajo y clientes',rows:[
+      {tag:'Lo que avanzó',   txt:'«¿Qué es lo más relevante que has sacado adelante desde la última vez?»',lit:1},
+      {tag:'Lo que costó',    txt:'«¿Cuál ha sido el momento más duro o el caso más difícil de este período?»',lit:1},
+      {tag:'Calidad técnica', txt:'¿Hay algún caso, declaración o expediente en el que hayas sentido que te faltaba base para resolverlo con seguridad?',lit:0},
+      {tag:'Clientes',        txt:'«¿Cómo llevas la relación con tus clientes? ¿Hay alguno que te quite energía o que te genere incertidumbre?»',lit:1},
+      {tag:'Plazos',          txt:'¿Sientes que tienes el tiempo necesario para hacer bien tu trabajo o hay semanas que vas apagando fuegos?',lit:0}
+    ]},
+    {s:'Equipo y coordinación',rows:[
+      {tag:'Con el área',     txt:'«¿Cómo funciona el día a día con tu equipo? ¿Hay algo que fluya bien y algo que chirría?»',lit:1},
+      {tag:'Entre áreas',     txt:'¿Hay algún punto de fricción en la coordinación con otra área — con Fiscal, Laboral, Jurídica?',lit:0},
+      {tag:'Herramientas',    txt:'¿Bitrix, Holded, A3, Inmatic... hay alguna herramienta con la que pierdas más tiempo del que deberías?',lit:0},
+      {tag:'Procesos',        txt:'Si pudieras cambiar una sola cosa de cómo trabajamos internamente, ¿qué sería?',lit:0}
+    ]},
+    {s:'Energía y entorno',rows:[
+      {tag:'Lo que da energía',txt:'¿Qué parte de tu trabajo te resulta más motivadora o interesante ahora mismo?',lit:0},
+      {tag:'Lo que la quita', txt:'¿Hay algo en tu entorno laboral — una situación, una dinámica, una tarea — que te esté quitando energía de forma sostenida?',lit:0},
+      {tag:'Apoyo recibido',  txt:'«¿Sientes que tienes el respaldo que necesitas de tu responsable y del equipo para hacer bien tu trabajo?»',lit:1}
+    ]}
    ],mm:true,nh:5},
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // B3 · RECONOCIMIENTO Y FEEDBACK · 10 min
+  // ─────────────────────────────────────────────────────────────────────────
   {num:3,t:'Reconocimiento y feedback',min:10,
-   hint:'Empieza SIEMPRE por el reconocimiento. Consulta la matriz de competencias antes.',
+   hint:'Reconocimiento primero, siempre. Sin él, el feedback de mejora suena a crítica. Prepara los dos antes de entrar a la sala.',
    subs:[
-    {s:'3.1 Reconocimiento',rows:[{tag:'Reconocer',txt:'Hecho concreto con impacto real — no impresión general.',lit:0}]},
-    {s:'3.2 Actitud y mejora',rows:[
-      {tag:'Mejorar',txt:'Un ejemplo real y reciente. Sé específico.',lit:0},
-      {tag:'Proactividad',txt:'¿Ha propuesto algo o se ha anticipado a un problema?',lit:0}]},
-    {s:'3.3 Nivel y formación',rows:[
-      {tag:'Nivel N1/N2/N3',txt:'¿En qué nivel está? ¿Qué necesita para avanzar?',lit:0},
-      {tag:'Competencias',txt:'Revisa puntuaciones esperadas y comenta brechas.',lit:0},
-      {tag:'Formación',txt:'Cursos en marcha, solicitudes, intereses.',lit:0},
-      {tag:'Inglés',txt:'¿Progresa según el nivel requerido? Prioridades 2025.',lit:0}]}
+    {s:'Reconocimiento',rows:[
+      {tag:'Hecho + impacto', txt:'Nombra un hecho concreto y observable. Explica el impacto real que tuvo. Añade por qué lo valoras específicamente en el contexto de BIPLAZA.',lit:0},
+      {tag:'Cómo lo ve',     txt:'«¿Eras consciente de que eso tuvo ese impacto? ¿Cómo te sentiste con ese momento?»',lit:1}
+    ]},
+    {s:'Feedback de mejora',rows:[
+      {tag:'Feedback Wrap',  txt:'Construye el Feedback Wrap antes de esta sesión: Contexto · Observación objetiva · Reconocimiento genuino · Necesidad real · Sugerencia concreta. No improvises.',lit:0},
+      {tag:'Pregunta de contraste', txt:'«¿Cómo lo ves tú? ¿Lo habías notado ya o es algo que no habías tenido en el radar?»',lit:1}
+    ]},
+    {s:'Nivel y desarrollo',rows:[
+      {tag:'Autopercepción', txt:'«¿Cómo sientes que estás en tu nivel actual? ¿Hay algo técnico en lo que notes que te falta solidez?»',lit:1},
+      {tag:'Siguiente paso', txt:'«¿Qué crees tú que necesitarías para dar el siguiente paso en BIPLAZA?»',lit:1},
+      {tag:'Formación',      txt:'«¿Hay algo que quieras aprender ahora mismo — un área técnica, una herramienta, algo que te haya generado curiosidad?»',lit:1}
+    ]}
    ],wrap:true,nh:4},
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // B4 · COMPROMISOS · 5 min
+  // ─────────────────────────────────────────────────────────────────────────
   {num:4,t:'Plan de acción y compromisos',min:5,
-   hint:'Compromisos concretos para ambas partes. Los del responsable son igual de vinculantes.',
+   hint:'Los compromisos del responsable van primero. Cada compromiso debe tener qué, cuándo y cómo sabremos que está hecho. Máximo 3 por parte.',
    comp:true,nh:0},
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // B5 · CIERRE · 5 min
+  // ─────────────────────────────────────────────────────────────────────────
   {num:5,t:'Cierre',min:5,
-   hint:'Termina en positivo. Resume compromisos en voz alta y confirma la próxima fecha.',
-   rows:[{tag:'Apertura final',txt:'¿Hay algo más que quieras compartir antes de cerrar?',lit:0},
-         {tag:'Valoración',txt:'¿Cómo te has sentido en esta reunión? ¿Te ha resultado útil?',lit:0}],
+   hint:'Resume compromisos en voz alta. Confirma la próxima fecha antes de salir. El email de seguimiento en 24-48h es parte del protocolo.',
+   rows:[
+     {tag:'Espacio final',   txt:'«¿Hay algo que hayas querido comentar y no hayamos tocado?»',lit:1},
+     {tag:'Utilidad real',   txt:'«¿Esta reunión te ha resultado útil? ¿Cambiarías algo de cómo la hacemos?»',lit:1}
+   ],
    cierre:true,nh:2}
 ];
 
 const AY_DETAIL={
   1:{
-    por:'Esta reunión empieza por la persona, no por las tareas. Si el colaborador/a no siente que hay un espacio seguro, el resto de la sesión será superficial. La confianza no se declara — se construye sesión a sesión con coherencia y presencia.',
-    como:'Empieza con una pregunta abierta sobre cómo está la persona, no sobre el trabajo. Escucha sin interrumpir. No tomes notas en este bloque — el papel y el bolígrafo crean distancia. Mantén contacto visual y lenguaje corporal abierto.',
-    que:'Cómo está la persona más allá del trabajo. Qué tiene en la cabeza. Si hay algo personal que quiera compartir. No es terapia — es reconocer que detrás de cada profesional hay una persona.',
+    por:'Esta reunión empieza por la persona, no por las tareas. Si el colaborador/a no siente que hay un espacio seguro, el resto de la sesión será superficial. La confianza se construye sesión a sesión — no se declara.',
+    como:'Empieza con una pregunta sobre cómo está la persona, no sobre el trabajo. No tomes notas en este bloque — el bolígrafo crea distancia. Mantén contacto visual. Si la respuesta es monosilábica, no fuerces — acepta y avanza.',
+    que:'Cómo está la persona más allá del trabajo. Qué tiene en la cabeza. Si hay algo de contexto personal o situacional que sea relevante. No es terapia — es reconocer que detrás de cada profesional hay una persona completa.',
     frase:'«Antes de entrar en el trabajo, me interesa saber cómo estás tú. ¿Cómo llevas estas semanas?»',
-    error:'Entrar directamente a hablar de tareas o proyectos. El colaborador/a nota inmediatamente que la reunión es una revisión disfrazada de one to one.',
+    error:'Entrar directamente a hablar de tareas o proyectos. El colaborador/a nota inmediatamente que la reunión es una revisión disfrazada de one-to-one.',
     good:['La persona habla desde el primer minuto','Comparte algo personal o de contexto','El tono es relajado, sin postura defensiva'],
-    bad:['Respuestas monosilábicas («bien», «normal»)','Tensión visible o postura cerrada','Parece pendiente de volver al trabajo'],
-    tip:'Si hay tensión, no la forces. Un «entiendo, no hay problema» y pasar al siguiente bloque es mejor que forzar apertura.'
+    bad:['Respuestas monosilábicas sin detalle','Tensión visible o postura cerrada','Parece pendiente de volver al trabajo cuanto antes'],
+    tip:'En temporada alta (abril-junio) es especialmente importante este bloque. La carga es máxima y la persona puede llegar agotada. Reconocer ese contexto antes de hablar de trabajo cambia el tono de toda la sesión.'
   },
   2:{
-    porPrimera:'En la primera sesión el objetivo cambia: conocer a la persona, establecer la línea base y crear el contrato de confianza. El B2 se adapta automáticamente.',
-    por:'El colaborador/a tiene información que tú no tienes: sabe qué procesos rozan, qué le quita energía, dónde se pierde tiempo. Si solo hablas tú, pierdes esa información. Este bloque es el más valioso de la sesión si se hace bien.',
+    porPrimera:'En la primera sesión el objetivo cambia: conocer a la persona, establecer la línea base y crear el contrato de confianza. El B2 se adapta automáticamente al guión de primera sesión.',
+    por:'El colaborador/a tiene información que tú no tienes: sabe qué procesos rozan, qué casos le generan inseguridad, dónde se pierde tiempo. Si solo hablas tú, pierdes esa información. Este bloque es el más valioso de la sesión si se hace bien.',
     como:'Haz preguntas abiertas y cierra la boca. El objetivo es que la persona hable el 60% del tiempo. Toma notas solo de palabras clave — no transcribas. Usa el silencio: si se calla, espera 3 segundos antes de hablar.',
-    que:'Tres ejes: tareas y proyectos (logros, retos, prioridades), procesos y herramientas (qué funciona, qué no, Bitrix), y clima laboral (ambiente, apoyo, bienestar). No tienes que cubrir todo en cada sesión — adapta según el contexto.',
-    frase:'«Cuéntame qué has conseguido desde que nos vimos. Y también qué es lo que más te ha costado.»',
-    error:'Interrumpir para dar soluciones o context. Si la persona dice «el proceso X no funciona bien» y tú respondes «sí, ya lo sé, es que...», has perdido la oportunidad de escuchar el fondo real.',
-    good:['La persona habla el 60% del tiempo o más','Propone mejoras o ideas propias sin que se le pida','Nombra obstáculos concretos'],
-    bad:['Solo responde lo que se le pregunta directamente','No menciona nada que se pueda mejorar','Defiende el status quo en todo'],
-    tip:'Si no habla espontáneamente: «¿Qué cambiarías si pudieras?» o «¿Qué es lo que más te cuesta estos días?»'
+    que:'Tres dimensiones: el trabajo con clientes (logros, retos técnicos, relación con la cartera), el equipo y la coordinación inter-área, y la energía y el entorno. No tienes que cubrir todo en cada sesión — adapta según lo que emerge.',
+    frase:'«Cuéntame qué has sacado adelante desde que nos vimos. Y también qué es lo que más te ha costado.»',
+    error:'Interrumpir para dar soluciones. Si la persona dice «el proceso X no funciona bien» y tú respondes «sí, ya lo sé, es que...», has cerrado la conversación antes de saber el fondo real.',
+    good:['La persona habla el 60% del tiempo o más','Menciona casos o clientes concretos','Nombra obstáculos específicos sin que se le pida'],
+    bad:['Solo responde lo que se le pregunta directamente','No menciona nada que se pueda mejorar','Las respuestas son genéricas y sin detalle'],
+    tip:'En BIPLAZA la relación con el cliente es parte del producto. Si la persona no menciona a sus clientes espontáneamente, pregunta directamente — ahí suele estar la información más relevante.'
   },
   3:{
     por:'El equipo necesita saber que su trabajo se ve y se valora. Sin reconocimiento genuino, el feedback de mejora suena a crítica y se recibe con defensividad. El orden importa: primero reconocer, siempre.',
-    como:'Empieza con un hecho concreto y su impacto real. Nunca con una impresión. Luego usa el Feedback Wrap para el feedback de mejora — cinco pasos preparados antes de la sesión, no improvisados. Cierra con nivel y formación: datos de la matriz de competencias, no percepciones.',
-    que:'Reconocimiento (hecho+impacto). Feedback de mejora (Feedback Wrap: contexto, observación, reconocimiento, necesidad, sugerencia). Nivel actual y brecha con el siguiente. Estado de formación en curso.',
-    frase:'«Quiero empezar diciéndote algo concreto que he observado y que me parece destacable...»',
-    error:'Dar el feedback antes del reconocimiento. O usar el reconocimiento como relleno: «eres muy buena persona, pero...». El «pero» borra todo lo anterior.',
-    good:['Reconocimiento específico: hecho concreto + impacto real','Feedback de mejora con ejemplo y sugerencia accionable','La persona no se pone a la defensiva — hace preguntas'],
-    bad:['Reconocimiento genérico («eres muy trabajador»)','Feedback como impresión («me parece que podrías mejorar»)','La persona se justifica o se cierra'],
-    tip:'Prepara el Feedback Wrap en papel ANTES de la sesión. La observación objetiva y el contexto tienen que ser hechos — no interpretaciones.'
+    como:'Empieza con un hecho concreto y su impacto real. Nunca con una impresión general. Luego usa el Feedback Wrap preparado antes de la sesión — nunca improvisado. Cierra con nivel y desarrollo: qué ve la propia persona, qué siguiente paso tiene sentido.',
+    que:'Reconocimiento (hecho observable + impacto real + cómo lo percibe la persona). Feedback de mejora (Feedback Wrap: contexto, observación, reconocimiento, necesidad, sugerencia). Desarrollo: autopercepción de nivel y aspiraciones de crecimiento.',
+    frase:'«Quiero empezar diciéndote algo concreto que he observado y que valoro especialmente...»',
+    error:'Dar el feedback antes del reconocimiento. O usar el reconocimiento como trampolín: «eres muy trabajador, pero...». El «pero» borra todo lo anterior — usa «y» o pausa antes de cambiar de tema.',
+    good:['Reconocimiento con hecho concreto e impacto específico','La persona no se pone a la defensiva — hace preguntas o asiente','Feedback de mejora con ejemplo observable y sugerencia accionable'],
+    bad:['Reconocimiento genérico («eres muy responsable»)','Feedback como impresión («me parece que podrías mejorar en»)','La persona se justifica o se cierra al recibir el feedback'],
+    tip:'Pregunta «¿cómo lo ves tú?» después del feedback. En BIPLAZA hay perfiles que ya son conscientes de sus áreas de mejora (momento 2 de competencia) — si ya lo saben, el trabajo es apoyarles a cerrar la brecha, no señalársela.'
   },
   4:{
-    por:'Sin compromisos, la sesión es una conversación agradable sin consecuencias. Los compromisos son el mecanismo que convierte el diálogo en mejora real. Y los compromisos del responsable son igual de vinculantes que los del colaborador/a — si no se cumplen, el sistema pierde credibilidad.',
-    como:'Cierra cada compromiso con tres elementos: qué se va a hacer, cuándo, y cómo sabremos que está hecho. Verbalizadlos en voz alta los dos. Anótalos en la app. Los compromisos del responsable van primero — marca el estándar.',
-    que:'Máximo 3 compromisos por parte. Concretos, con fecha, medibles. No «mejorar la comunicación» — sí «enviar el resumen de la reunión de área los lunes antes de las 10h».',
-    frase:'«Antes de cerrar, quiero que repasemos los compromisos de los dos — el mío primero.»',
+    por:'Sin compromisos, la sesión es una conversación agradable sin consecuencias. Los compromisos son el mecanismo que convierte el diálogo en mejora real. Y los del responsable son igual de vinculantes — si no se cumplen, el modelo pierde credibilidad en 2-3 sesiones.',
+    como:'Los compromisos del responsable van primero — marca el estándar. Cada compromiso: qué se va a hacer, cuándo, y cómo sabremos que está hecho. Verbalizadlos en voz alta los dos. Anótalos en PULSO.',
+    que:'Máximo 3 compromisos por parte. Concretos, con fecha, verificables. No «mejorar la comunicación con el cliente» — sí «llamar a proactivamente a los clientes de la cartera con cierre pendiente antes del viernes».',
+    frase:'«Antes de cerrar, repasamos los compromisos de los dos — el mío primero.»',
     error:'Que solo haya compromisos del colaborador/a. Si el responsable no tiene ningún compromiso, la persona siente que la reunión es una evaluación unilateral, no una conversación entre iguales.',
-    good:['Compromisos específicos con fecha y criterio de éxito','El responsable tiene compromisos propios registrados','Ambas partes los verbalizan en voz alta'],
-    bad:['Solo hay compromisos del colaborador/a','Los compromisos son vagos o sin fecha','No se verbalizan — solo se anotan'],
-    tip:'Un compromiso sin fecha no es un compromiso — es una intención. Si no cabe una fecha concreta, no es un compromiso suficientemente específico.'
+    good:['Compromisos específicos con fecha y criterio de éxito claro','El responsable tiene compromisos propios registrados en PULSO','Ambas partes los verbalizan en voz alta antes de salir'],
+    bad:['Solo hay compromisos del colaborador/a','Los compromisos son vagos o sin fecha concreta','Se anotan pero no se verbalizan — se perciben como trámite'],
+    tip:'Si un compromiso lleva 2 sesiones sin cerrarse, no lo repitas igual — pregunta qué lo está bloqueando. Puede que sea un compromiso mal formulado o que haya un obstáculo real que hay que abordar.'
   },
   5:{
-    por:'El cierre es lo que queda. Una sesión que termina de forma abrupta o incompleta deja una sensación de precipitación que contamina todo lo anterior. Tres minutos bien usados aquí multiplican el impacto de los 30 anteriores.',
-    como:'Resume los compromisos de los dos en voz alta. Confirma la próxima fecha antes de salir de la sala. Pregunta cómo se ha sentido la persona en la reunión — ese feedback sobre la reunión es tu mejor herramienta de mejora continua.',
-    que:'Resumen de compromisos (ambas partes). Confirmación de próxima fecha. Pregunta de cierre sobre la utilidad de la sesión. Email de resumen en 24–48h con compromisos y próxima fecha.',
+    por:'El cierre es lo que queda. Una sesión que termina de forma abrupta deja una sensación de precipitación que contamina todo lo anterior. 3 minutos bien usados aquí multiplican el impacto de los 30 anteriores.',
+    como:'Resume los compromisos de los dos en voz alta. Confirma la próxima fecha antes de salir de la sala. Pregunta cómo se ha sentido la persona — ese feedback sobre la reunión es tu mejor herramienta de mejora continua.',
+    que:'Resumen de compromisos (ambas partes). Confirmación de próxima fecha. Pregunta de cierre sobre la utilidad de la sesión. Email de resumen en 24-48h con compromisos y próxima fecha.',
     frase:'«Para cerrar: repasamos compromisos, confirmamos fecha, y me gustaría saber cómo te has sentido en esta reunión.»',
-    error:'Terminar cuando suena el teléfono o alguien llama a la puerta. La próxima fecha no confirmada en ese momento tiene un 80% de probabilidad de no programarse hasta que el semáforo vuelva a ponerse en rojo.',
-    good:['Sale de la reunión con la próxima fecha en la agenda','Compromisos claros y verbalizados para ambas partes','La persona valora positivamente la utilidad de la sesión'],
-    bad:['Cierre abrupto sin resumen','Sin próxima fecha confirmada','Sin email de seguimiento en 48h'],
-    tip:'El email de resumen no tiene que ser largo. Tres líneas con los compromisos y la próxima fecha son suficientes — y hacen toda la diferencia.'
+    error:'Cerrar cuando suena el teléfono o alguien interrumpe. La próxima fecha no confirmada en ese momento tiene un 80% de probabilidad de no programarse hasta que el semáforo vuelva a ponerse en rojo.',
+    good:['Sale con la próxima fecha confirmada en la agenda — en PULSO','Compromisos claros y verbalizados para ambas partes','La persona valora positivamente la utilidad de la sesión'],
+    bad:['Cierre abrupto sin resumen de compromisos','Sin próxima fecha confirmada','Sin email de seguimiento en 48h'],
+    tip:'El email de seguimiento no tiene que ser largo. Asunto concreto, compromisos de ambas partes con fecha, y próxima sesión. Tres minutos redactándolo con Beni.'
   }
 };
 
@@ -1115,28 +1145,32 @@ const B2_PRIMERA={
   num:2,t:'Conocer a la persona',min:15,
   hint:'Esta es la primera sesión. El objetivo es conocer a la persona, establecer la línea base y crear el contrato de confianza. Escucha. No juzgues. No hay respuestas incorrectas.',
   subs:[
-    {s:'2.1 Contrato de confianza',rows:[
-      {tag:'Para qué',txt:'«Quiero explicarte para qué son estas reuniones. No son evaluaciones — son un espacio tuyo para hablar de tu trabajo, de lo que necesitas y de cómo podemos mejorar juntos.»',lit:1},
-      {tag:'Confidencial',txt:'«Lo que hablemos aquí queda entre nosotros, salvo que acordemos explícitamente compartir algo.»',lit:1},
-      {tag:'Compromiso',txt:'«Yo también tengo compromisos en estas reuniones. Si te digo que voy a hacer algo, lo hago.»',lit:1},
-      {tag:'Expectativas',txt:'¿Qué esperarías tú de estas reuniones para que te resulten útiles?',lit:0}]},
-    {s:'2.2 Tu trayectoria y motivación',rows:[
-      {tag:'Origen',txt:'«Me gustaría saber un poco más de ti. ¿Cómo llegaste a BIPLAZA y qué te trajo hasta aquí?»',lit:1},
-      {tag:'Lo mejor',txt:'¿Qué es lo que más te gusta de tu trabajo actualmente?',lit:0},
-      {tag:'Lo difícil',txt:'¿Qué es lo que más te cuesta o lo que cambiarías si pudieras?',lit:0},
-      {tag:'Motivación',txt:'¿Qué tipo de trabajo o proyectos te hacen sentir más implicado/a?',lit:0}]},
-    {s:'2.3 Situación actual',rows:[
-      {tag:'Carga',txt:'¿Cómo llevas el volumen de trabajo? ¿Sientes que tienes tiempo para hacer las cosas bien?',lit:0},
-      {tag:'Equipo',txt:'¿Cómo te llevas con el equipo? ¿Hay algo que funcione especialmente bien o que sea difícil?',lit:0},
-      {tag:'Herramientas',txt:'¿Tienes lo que necesitas para trabajar bien? Herramientas, formación, información.',lit:0},
-      {tag:'Mejora',txt:'Si pudieras cambiar una sola cosa de cómo trabajamos en BIPLAZA, ¿qué sería?',lit:0}]},
-    {s:'2.4 Desarrollo y futuro',rows:[
-      {tag:'Aprendizaje',txt:'¿Hay algo que quieras aprender o mejorar en tu trabajo este año?',lit:0},
-      {tag:'Aspiraciones',txt:'¿Cómo te imaginas dentro de dos o tres años en BIPLAZA?',lit:0},
-      {tag:'Apoyo',txt:'¿Qué podría hacer yo como responsable para apoyarte mejor?',lit:0}]}
+    {s:'Contrato de confianza',rows:[
+      {tag:'Para qué sirve', txt:'«Quiero explicarte para qué son estas reuniones. No son evaluaciones — son un espacio tuyo para hablar de tu trabajo, de lo que necesitas y de cómo podemos mejorar juntos.»',lit:1},
+      {tag:'Confidencialidad',txt:'«Lo que hablemos aquí queda entre nosotros, salvo que acordemos explícitamente compartir algo.»',lit:1},
+      {tag:'Mi compromiso',  txt:'«Yo también tengo compromisos en estas reuniones. Si te digo que voy a hacer algo, lo hago. Y si no puedo, te lo digo.»',lit:1},
+      {tag:'Tus expectativas',txt:'«¿Qué necesitarías tú de estas reuniones para que te resultaran útiles de verdad?»',lit:1}
+    ]},
+    {s:'Tu camino hasta aquí',rows:[
+      {tag:'Origen',         txt:'«Me gustaría conocerte un poco más. ¿Cómo llegaste a BIPLAZA y qué te trajo hasta aquí?»',lit:1},
+      {tag:'Lo que te motiva',txt:'«¿Qué parte de tu trabajo te resulta más interesante o motivadora ahora mismo?»',lit:1},
+      {tag:'Lo que te cuesta',txt:'«¿Hay algo en tu día a día que te pese más de lo que debería o que cambiarías si pudieras?»',lit:1}
+    ]},
+    {s:'La situación actual',rows:[
+      {tag:'Carga y ritmo',  txt:'«¿Cómo llevas el volumen de trabajo? ¿Tienes tiempo para hacer las cosas con la calidad que te gustaría?»',lit:1},
+      {tag:'Tus clientes',   txt:'«¿Cómo es la relación con los clientes de tu cartera? ¿Hay alguno que te genere incertidumbre o que lleve más carga de lo normal?»',lit:1},
+      {tag:'El equipo',      txt:'«¿Cómo te llevas con el equipo? ¿Hay algo que funcione especialmente bien o algo que te resulte difícil?»',lit:1},
+      {tag:'Una mejora',     txt:'«Si pudieras cambiar una sola cosa de cómo trabajamos en BIPLAZA, ¿qué sería?»',lit:1}
+    ]},
+    {s:'Desarrollo y futuro',rows:[
+      {tag:'Quiero aprender', txt:'«¿Hay algo que quieras aprender o mejorar este año — técnico, de herramientas, de relación con clientes?»',lit:1},
+      {tag:'En 2-3 años',    txt:'«¿Cómo te imaginas dentro de dos o tres años en BIPLAZA? ¿Hacia dónde quieres crecer?»',lit:1},
+      {tag:'Qué puedo hacer',txt:'«¿Qué podría hacer yo como responsable para apoyarte mejor?»',lit:1}
+    ]}
   ],
   mm:true,nh:4
 };
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  STORAGE
