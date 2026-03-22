@@ -3183,6 +3183,17 @@ function openModal(type,idx){
 
 function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
 
+// Aliases para modales con contenido dinámico (DPT, plantillas, etc.)
+function openMo(){
+  const bg=document.getElementById('modal-bg');
+  const inner=document.getElementById('modal-inner');
+  if(!bg||!inner) return;
+  // Asegurar que el modal permite scroll para contenido largo
+  inner.style.cssText='max-height:90vh;overflow-y:auto;width:100%;max-width:600px;';
+  bg.classList.add('open');
+}
+function closeMo(){closeModal();}
+
 function openModalForP(name){
   openModal('prog');
   setTimeout(()=>{const s=document.getElementById('modal-p');if(s)s.value=name;},30);
