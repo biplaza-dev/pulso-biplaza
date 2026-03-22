@@ -254,6 +254,7 @@ textarea:focus{outline:none;border-color:var(--oro);box-shadow:0 0 0 3px rgba(21
 .hi-body.open{display:block}
 .hi-sec{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx3);margin:8px 0 5px}
 /* PROFILE */
+.prof-hero{background:var(--sb);border-radius:var(--r);padding:20px 24px;margin-bottom:16px}
 .prof-tabs{display:flex;gap:2px;background:var(--sb);border-radius:var(--r2);padding:3px;margin-bottom:16px}
 .prof-tab-btn{flex:1;padding:7px 10px;border:none;background:transparent;border-radius:5px;font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.35);cursor:pointer;font-family:var(--f);transition:all 0.13s;text-align:center}
 .prof-tab-btn.active{background:var(--oro);color:var(--sb)}
@@ -1604,6 +1605,13 @@ function go(id,el){
   const T={db:'Dashboard',cal:'Calendario',qs:'Iniciar One to One',eq:'Equipo',ses:'Sesión activa',hi:'Historial',prof:'Perfil',tm:'Gestionar equipo',dp:'Puestos de trabajo',ay:'Metodología'};
   document.getElementById('tb-title').textContent=T[id]||id;
   document.getElementById('tb-crumb').textContent='';
+  // Reset profPerson indicator when leaving profile
+  if(id!=='prof'){
+    const profNav=document.getElementById('ni-prof');
+    if(profNav) profNav.style.display='none';
+    const backBtn=document.getElementById('prof-back-btn');
+    if(backBtn) backBtn.remove();
+  }
   const mb=document.getElementById('mainbody');
   mb.scrollTop=0;
   mb.style.padding='24px';
@@ -2487,6 +2495,20 @@ function openProfDirect(name){
   document.getElementById('ni-prof').style.display='flex';
   document.getElementById('ni-prof-n').textContent=name;
   go('prof',document.getElementById('ni-prof'));
+  // Show person name in topbar with back button
+  document.getElementById('tb-title').textContent=name;
+  const tbr = document.getElementById('tb-r');
+  if(tbr && !document.getElementById('prof-back-btn')){
+    const backBtn = document.createElement('button');
+    backBtn.id = 'prof-back-btn';
+    backBtn.title = 'Volver';
+    backBtn.style.cssText='display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--r2);background:none;border:1px solid var(--bd);cursor:pointer;color:var(--tx3);font-size:12px;font-family:var(--f);transition:all 0.14s;margin-right:4px';
+    backBtn.innerHTML='<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke-width="2"/></svg> Volver';
+    backBtn.onmouseover=()=>{backBtn.style.borderColor='var(--oro)';backBtn.style.color='var(--oroD)';};
+    backBtn.onmouseout=()=>{backBtn.style.borderColor='var(--bd)';backBtn.style.color='var(--tx3)';};
+    backBtn.onclick=()=>{ backBtn.remove(); go('eq', document.getElementById('ni-eq')); };
+    tbr.prepend(backBtn);
+  }
 }
 
 // ── Estado de tab activo en la ficha ────────────────────────────────────────
@@ -2522,17 +2544,20 @@ function rendProf(){
   h+=`<div style="display:flex;align-items:flex-start;gap:16px">`;
   h+=`<div class="av-lg">${ini(p.n)}</div>`;
   h+=`<div style="flex:1"><div style="font-size:22px;font-weight:500;color:var(--wh)">${p.n}</div><div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:3px">${p.a} · <span style="color:var(--oro);font-weight:600">${p.nv}</span></div>`;
-  h+=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"><span class="pill p-${st}">${semLbl(p,ls)}</span><span class="pill p-gray">${hist.length} sesión${hist.length!==1?'es':''}</span>${prog.length?`<span class="pill p-amb">Próxima: ${fmtD(prog[0].fecha)}</span>`:''}</div></div>`;
+  h+=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"><span class="pill p-${st}">${semLbl(p,ls)}</span>${hist.length>0?`<span class="pill p-gray">${hist.length} sesión${hist.length!==1?'es':''}</span>`:''} ${prog.length?`<span class="pill p-amb">Próxima: ${fmtD(prog[0].fecha)}</span>`:''}</div></div>`;
   h+=`<div style="display:flex;gap:8px;align-items:center;flex-shrink:0">`;
-  h+=`<button class="btn lt" style="padding:7px 12px;font-size:12px" onclick="beniPrep('${p.n}');if(!_beniOpen)beniToggle()">✦ Preparar</button>`;
-  h+=`<button class="btn go" style="padding:9px 16px" onclick="quickStart('${p.n}')">Iniciar →</button>`;
+  h+=`<button class="btn lt" style="padding:7px 12px;font-size:12px;display:flex;align-items:center;gap:5px" onclick="beniPrep('${p.n}');if(!_beniOpen)beniToggle()">
+    <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.5 4.5H12L8.25 7.5 9.75 12 6 9 2.25 12l1.5-4.5L0 4.5h4.5z"/></svg>
+    Preparar
+  </button>`;
+  h+=`<button class="btn go" style="padding:9px 16px" onclick="quickStart('${p.n}')">Iniciar sesión →</button>`;
   h+=`</div>`;
   h+=`</div>`;
   if(hist.length>1){
     h+=`<div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:20px">`;
     h+=`<div style="text-align:center"><div style="font-size:18px;font-weight:600;color:var(--oro)">${hist.length}</div><div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px">sesiones</div></div>`;
-    h+=`<div style="text-align:center"><div style="font-size:18px;font-weight:600;color:${allCC.length?'var(--oro)':'rgba(255,255,255,0.3)'}">${allCC.length}</div><div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px">comp. propios</div></div>`;
-    h+=`<div style="text-align:center"><div style="font-size:18px;font-weight:600;color:${allCR.length?'var(--oro)':'rgba(255,255,255,0.3)'}">${allCR.length}</div><div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px">comp. responsable</div></div>`;
+    h+=`<div style="text-align:center"><div style="font-size:18px;font-weight:600;color:${allCC.length?'var(--oro)':'rgba(255,255,255,0.3)'}">${allCC.length}</div><div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px">suyos</div></div>`;
+    h+=`<div style="text-align:center"><div style="font-size:18px;font-weight:600;color:${allCR.length?'var(--oro)':'rgba(255,255,255,0.3)'}">${allCR.length}</div><div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px">míos</div></div>`;
     h+=`</div>`;
   }
   h+=`</div>`;
@@ -2566,7 +2591,14 @@ function rendProf(){
       onclick="beniTrayectoria('${p.n}')">✦ Analizar trayectoria</button>`:''}
   </div>`;
   if(!hist.length){
-    h+=`<div class="ibox" style="padding:24px;text-align:center"><div style="font-size:13px;color:var(--tx3);font-style:italic;margin-bottom:10px">Sin sesiones registradas</div><button class="btn dk" onclick="quickStart('${p.n}')">Iniciar primera sesión →</button></div>`;
+    h+=`<div class="ibox" style="padding:24px;text-align:center">
+  <div style="width:40px;height:40px;border-radius:50%;background:var(--cream);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+    <svg width="18" height="18" fill="none" stroke="var(--tx4)" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke-width="2"/></svg>
+  </div>
+  <div style="font-size:13px;font-weight:500;color:var(--tx);margin-bottom:4px">Aún no hay sesiones con ${p.n}</div>
+  <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">Usa el botón «Iniciar →» en la parte superior para comenzar la primera sesión.</div>
+  <button class="btn lt" style="font-size:12px" onclick="openModalForP('${p.n}')">Programar sesión →</button>
+</div>`;
   } else {
     hist.forEach((s,sidx)=>{
       const cc=(s.c?.c||[]).filter(Boolean),cr=(s.c?.r||[]).filter(Boolean);
