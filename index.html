@@ -2596,8 +2596,8 @@ async function rendProfDPT(){
       h+=`<div class="ibox" style="padding:28px;text-align:center">
         <div style="font-size:22px;margin-bottom:10px">📋</div>
         <div style="font-size:13px;font-weight:500;color:var(--tx);margin-bottom:6px">Sin fichas de puesto creadas</div>
-        <div style="font-size:12px;color:var(--tx3);line-height:1.6;margin-bottom:14px">Crea las fichas de puesto en Ajustes → Plantillas. Son plantillas compartidas para cada tipo de cargo.</div>
-        <button class="btn dk" style="font-size:12px" onclick="closeSettings();cfgTab&&cfgTab(3);openSettings()">Ir a Ajustes → Plantillas</button>
+        <div style="font-size:12px;color:var(--tx3);line-height:1.6;margin-bottom:14px">Crea las fichas de puesto en la sección <b>Puestos de trabajo</b> del menú. Son fichas compartidas para cada tipo de cargo.</div>
+        <button class="btn dk" style="font-size:12px" onclick="go('dp',document.getElementById('ni-dp'))">Ir a Puestos de trabajo →</button>
       </div>`;
     }else{
       h+=`<div class="ibox" style="padding:28px;text-align:center">
@@ -2621,7 +2621,7 @@ async function rendProfDPT(){
 
   h+=`<div class="ibox" style="padding:18px 20px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-      <div style="font-size:12px;color:var(--tx3)">Ficha compartida para el cargo · <a href="#" onclick="event.preventDefault();openSettings();setTimeout(()=>cfgTab(3),100)" style="color:var(--oroD)">Editar en Ajustes →</a></div>
+      <div style="font-size:12px;color:var(--tx3)">Ficha compartida para el cargo · <a href="#" onclick="event.preventDefault();dpEditar('${plantilla.id}');go('dp',document.getElementById('ni-dp'))" style="color:var(--oroD)">Editar ficha →</a></div>
     </div>
     ${sec('1','El puesto','Cargo, objetivo y funciones')}
     ${campo('Denominación del cargo',b1.cargo)}
@@ -2643,7 +2643,9 @@ async function rendProfDPT(){
 async function dptSelectorPuesto(nombrePersona){
   const {data:plantillas}=await sb.from('plantillas_puesto').select('*').order('area').order('nombre');
   if(!plantillas?.length){
-    alert('No hay fichas de puesto creadas. Ve a Ajustes → Plantillas para crear la primera.');
+    if(confirm('Todavía no hay fichas de puesto creadas.\n\n¿Ir a la sección Puestos de trabajo para crear la primera?')){
+      go('dp',document.getElementById('ni-dp'));
+    }
     return;
   }
   const pid=C.pmap[nombrePersona]?.id;
@@ -3475,91 +3477,106 @@ let _dpEdit=null; // puesto en edición
 async function rendDP(){
   const el=document.getElementById('dp-content');
   if(!el) return;
-  el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--tx3);font-size:13px">Cargando puestos...</div>`;
+  el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--tx3);font-size:13px">Cargando...</div>`;
 
-  // Cargar todos los DPTs con datos de persona
-  let puestos=[];
+  let plantillas=[];
   try{
-    const {data}=await sb.from('dpt')
-      .select('*, personas(nombre, area, nivel, activa)')
-      .order('updated_at',{ascending:false});
-    puestos=data||[];
-  }catch(e){console.warn('DPT dir load',e);}
+    const {data}=await sb.from('plantillas_puesto').select('*').order('area').order('nombre');
+    plantillas=data||[];
+  }catch(e){console.warn('DP load',e);}
+
+  // Contar personas asignadas por plantilla
+  const asignados={};
+  try{
+    const {data}=await sb.from('personas').select('plantilla_puesto_id').not('plantilla_puesto_id','is',null);
+    (data||[]).forEach(p=>{ asignados[p.plantilla_puesto_id]=(asignados[p.plantilla_puesto_id]||0)+1; });
+  }catch(e){}
+
+  // Header
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+    <div>
+      <div style="font-size:20px;font-weight:600;color:var(--tx)">Puestos de trabajo</div>
+      <div style="font-size:12px;color:var(--tx3);margin-top:3px">${plantillas.length} ficha${plantillas.length!==1?'s':''} definida${plantillas.length!==1?'s':''}</div>
+    </div>
+    <button class="btn go" onclick="dpNueva()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke-width="2"/><line x1="5" y1="12" x2="19" y2="12" stroke-width="2"/></svg>
+      Nueva ficha de puesto
+    </button>
+  </div>`;
+
+  if(!plantillas.length){
+    h+=`<div class="ibox" style="padding:40px;text-align:center">
+      <div style="font-size:36px;margin-bottom:12px">📋</div>
+      <div style="font-size:15px;font-weight:600;color:var(--tx);margin-bottom:8px">Sin fichas de puesto creadas</div>
+      <div style="font-size:13px;color:var(--tx3);line-height:1.7;max-width:400px;margin:0 auto 20px">
+        Las fichas de puesto definen el cargo, el perfil y el camino de desarrollo para cada rol del equipo. Una vez creadas, podrás asignarlas a cada persona desde su ficha individual.
+      </div>
+      <button class="btn go" onclick="dpNueva()">Crear la primera ficha →</button>
+    </div>`;
+    el.innerHTML=h;
+    return;
+  }
 
   // Agrupar por área
   const porArea={};
-  C.team.filter(p=>p.on).forEach(p=>{
-    if(!porArea[p.a]) porArea[p.a]={total:0,conDPT:0,personas:[]};
-    porArea[p.a].total++;
-    const dpt=puestos.find(d=>d.personas?.nombre===p.n);
-    if(dpt&&dpt.completitud>0) porArea[p.a].conDPT++;
-    porArea[p.a].personas.push({...p,dpt:dpt||null});
+  plantillas.forEach(pl=>{
+    if(!porArea[pl.area||'Sin área']) porArea[pl.area||'Sin área']=[];
+    porArea[pl.area||'Sin área'].push(pl);
   });
 
-  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-    <div>
-      <div style="font-size:20px;font-weight:600;color:var(--tx)">Puestos de trabajo</div>
-      <div style="font-size:12px;color:var(--tx3);margin-top:3px">${puestos.filter(d=>d.completitud>0).length} de ${C.team.filter(p=>p.on).length} personas con DPT iniciada</div>
-    </div>
-  </div>`;
+  Object.entries(porArea).forEach(([area,lista])=>{
+    h+=`<div style="margin-bottom:28px">
+      <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)">${area} · ${lista.length} puesto${lista.length!==1?'s':''}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">`;
 
-  // Progreso global
-  const total=C.team.filter(p=>p.on).length;
-  const conDPT=puestos.filter(d=>d.completitud>0).length;
-  const pctGlobal=total?Math.round((conDPT/total)*100):0;
-  h+=`<div class="ibox" style="padding:16px 20px;margin-bottom:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <span style="font-size:12px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px">Progreso global</span>
-      <span style="font-size:13px;font-weight:700;color:${pctGlobal===100?'var(--ok)':pctGlobal>50?'var(--oroD)':'var(--tx3)'}">${pctGlobal}%</span>
-    </div>
-    <div class="dpt-prog"><div class="dpt-prog-bar" style="width:${pctGlobal}%"></div></div>
-    <div style="display:flex;gap:16px;margin-top:10px">
-      ${Object.entries(porArea).map(([area,data])=>{
-        const pct=data.total?Math.round((data.conDPT/data.total)*100):0;
-        return `<div style="flex:1;text-align:center">
-          <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-bottom:4px">${area}</div>
-          <div style="font-size:16px;font-weight:700;color:${pct===100?'var(--ok)':pct>0?'var(--oroD)':'var(--tx4)'}">${pct}%</div>
-          <div style="font-size:10px;color:var(--tx4)">${data.conDPT}/${data.total}</div>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
+    lista.forEach(pl=>{
+      const n=asignados[pl.id]||0;
+      const cargo=pl.bloque_1?.cargo||'';
+      const b1ok=!!(pl.bloque_1?.cargo&&pl.bloque_1?.objetivo&&pl.bloque_1?.funciones);
+      const b2ok=!!(pl.bloque_2?.formacion&&pl.bloque_2?.competencias_tecnicas);
+      const b3ok=!!(pl.bloque_3?.camino&&pl.bloque_3?.que_debe_demostrar);
+      const completos=[b1ok,b2ok,b3ok].filter(Boolean).length;
+      const pct=Math.round((completos/3)*100);
 
-  // Lista por área
-  Object.entries(porArea).forEach(([area,data])=>{
-    h+=`<div style="margin-bottom:20px">
-      <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
-        <span class="dot-${area==='Laboral'?'lab':area==='Contable'?'con':area==='Fiscal'?'fis':area==='Jurídica'?'jur':'adm'}" style="width:8px;height:8px;border-radius:50%;background:var(--oroD);display:inline-block"></span>
-        ${area} · ${data.conDPT}/${data.total} con DPT
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">`;
-
-    data.personas.forEach(p=>{
-      const dpt=p.dpt;
-      const pct=dpt?.completitud||0;
-      const cargo=dpt?.bloque_1?.cargo||'Sin cargo definido';
-      const estado=pct===0?'Pendiente':pct===100?'Completa':'En progreso';
-      const color=pct===0?'var(--tx4)':pct===100?'var(--ok)':'var(--oroD)';
-
-      h+=`<div class="ibox" style="padding:14px 16px;cursor:pointer;transition:all 0.13s" 
-        onmouseover="this.style.borderColor='var(--oro)'" 
-        onmouseout="this.style.borderColor='var(--bd)'"
-        onclick="openProfDirect('${p.n}');profTabAct='dpt';setTimeout(()=>profTab('dpt'),100)">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div class="av-sm">${ini(p.n)}</div>
+      h+=`<div class="ibox" style="padding:0;overflow:hidden">
+        <!-- Fila principal -->
+        <div style="display:flex;align-items:center;gap:16px;padding:16px 18px;cursor:pointer"
+          onclick="dpEditar('${pl.id}')"
+          onmouseover="this.style.background='var(--cream)'" onmouseout="this.style.background=''">
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.n}</div>
-            <div style="font-size:11px;color:var(--tx3)">${p.nv}</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px">
+              <div style="font-size:14px;font-weight:600;color:var(--tx)">${pl.nombre}</div>
+              ${cargo?`<div style="font-size:11px;color:var(--tx3);background:var(--cream);border:1px solid var(--bd);border-radius:var(--r3);padding:2px 8px">${cargo}</div>`:''}
+            </div>
+            ${pl.descripcion?`<div style="font-size:12px;color:var(--tx3)">${pl.descripcion}</div>`:''}
           </div>
-          <span style="font-size:10px;font-weight:700;color:${color};white-space:nowrap">${estado}</span>
+          <div style="display:flex;align-items:center;gap:16px;flex-shrink:0">
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:700;color:${n>0?'var(--oroD)':'var(--tx4)'}">${n}</div>
+              <div style="font-size:10px;color:var(--tx4)">${n===1?'persona':'personas'}</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:700;color:${pct===100?'var(--ok)':pct>0?'var(--oroD)':'var(--tx4)'}">${pct}%</div>
+              <div style="font-size:10px;color:var(--tx4)">completada</div>
+            </div>
+            <svg width="16" height="16" fill="none" stroke="var(--tx3)" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-width="2"/></svg>
+          </div>
         </div>
-        <div style="font-size:11.5px;color:var(--tx3);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cargo}</div>
-        <div style="height:3px;background:var(--cD);border-radius:2px;overflow:hidden">
-          <div style="height:100%;background:${color};width:${pct}%;border-radius:2px;transition:width 0.3s"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:5px">
-          <span style="font-size:10px;color:var(--tx4)">${pct}% completada</span>
-          <span style="font-size:10px;color:var(--oroD)">Editar →</span>
+        <!-- Barra de progreso y bloques -->
+        <div style="padding:10px 18px 14px;border-top:1px solid var(--cD);background:var(--cream)">
+          <div style="display:flex;gap:6px;align-items:center">
+            ${['El puesto','El perfil','El desarrollo'].map((b,i)=>{
+              const ok=[b1ok,b2ok,b3ok][i];
+              return `<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:${ok?'var(--ok)':'var(--tx4)'}">
+                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24">${ok?'<path d="M20 6L9 17l-5-5" stroke-width="2.5"/>':'<circle cx="12" cy="12" r="9" stroke-width="2"/>'}</svg>
+                ${b}
+              </div>`;
+            }).join('<span style="color:var(--bd);font-size:10px;margin:0 4px">·</span>')}
+            <div style="flex:1"></div>
+            <button style="background:none;border:none;font-size:11px;color:var(--tx3);cursor:pointer;font-family:var(--f);padding:3px 8px;border-radius:var(--r3);border:1px solid var(--bd)"
+              onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tx3)'"
+              onclick="event.stopPropagation();dpEliminar('${pl.id}','${pl.nombre.replace(/'/g,"\'")}')">Eliminar</button>
+          </div>
         </div>
       </div>`;
     });
@@ -3569,6 +3586,126 @@ async function rendDP(){
 
   el.innerHTML=h;
 }
+
+function dpNueva(){ _dpModal(null); }
+
+async function dpEditar(id){
+  const {data}=await sb.from('plantillas_puesto').select('*').eq('id',id).single();
+  if(data) _dpModal(data);
+}
+
+async function dpEliminar(id,nombre){
+  // Verificar si tiene personas asignadas
+  const {data:asig}=await sb.from('personas').select('id').eq('plantilla_puesto_id',id);
+  if(asig?.length){
+    if(!confirm(`"${nombre}" está asignada a ${asig.length} persona${asig.length!==1?'s':''}.
+
+¿Eliminar de todas formas? Las personas quedarán sin puesto asignado.`)) return;
+    await sb.from('personas').update({plantilla_puesto_id:null}).eq('plantilla_puesto_id',id);
+  }else{
+    if(!confirm(`¿Eliminar la ficha de puesto "${nombre}"?`)) return;
+  }
+  await sb.from('plantillas_puesto').delete().eq('id',id);
+  rendDP();
+}
+
+function _dpModal(pl){
+  const isNew=!pl;
+  const fi=(id,val,ph)=>`<input id="${id}" value="${(val||'').replace(/"/g,'&quot;')}" placeholder="${ph}" style="width:100%;border:1px solid var(--bd);border-radius:var(--r2);padding:9px 12px;font-size:13px;font-family:var(--f);color:var(--tx);background:var(--wh);outline:none;box-sizing:border-box;transition:border-color 0.12s;margin-bottom:10px" onfocus="this.style.borderColor='var(--oro)'" onblur="this.style.borderColor='var(--bd)'">`;
+  const ta=(id,val,ph,rows)=>`<textarea id="${id}" rows="${rows}" placeholder="${ph}" style="width:100%;border:1px solid var(--bd);border-radius:var(--r2);padding:9px 12px;font-size:13px;font-family:var(--f);color:var(--tx);background:var(--wh);resize:vertical;outline:none;box-sizing:border-box;line-height:1.5;margin-bottom:10px;transition:border-color 0.12s" onfocus="this.style.borderColor='var(--oro)'" onblur="this.style.borderColor='var(--bd)'">${val||''}</textarea>`;
+  const lbl=(t,sub)=>`<div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px">${t}${sub?` <span style="font-weight:400;text-transform:none;font-size:10px">${sub}</span>`:''}`;
+  const sec=(num,t)=>`<div style="font-size:11px;font-weight:700;color:var(--oroD);text-transform:uppercase;letter-spacing:0.5px;margin:20px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--oroL)">${num} · ${t}</div>`;
+  const areas=['Laboral','Contable','Fiscal','Jurídica','Admin'];
+
+  const modal=document.getElementById('modal-inner');
+  modal.innerHTML=`<div style="padding:0">
+    <!-- Header del modal -->
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--wh);z-index:1">
+      <div style="font-size:16px;font-weight:700;color:var(--tx)">${isNew?'Nueva ficha de puesto':'Editar ficha de puesto'}</div>
+      <div style="font-size:12px;color:var(--tx3);margin-top:2px">Define el cargo, el perfil y el camino de desarrollo</div>
+    </div>
+    <!-- Cuerpo -->
+    <div style="padding:20px 24px;max-height:72vh;overflow-y:auto">
+      <!-- Datos básicos -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+        <div>
+          ${lbl('Nombre del puesto')}</div>
+          ${fi('dp-nombre',pl?.nombre,'Ej: Asesor/a Contable N2')}
+        </div>
+        <div>
+          ${lbl('Área')}</div>
+          <select id="dp-area" style="width:100%;border:1px solid var(--bd);border-radius:var(--r2);padding:9px 12px;font-size:13px;font-family:var(--f);color:var(--tx);background:var(--wh);outline:none;box-sizing:border-box;margin-bottom:10px;cursor:pointer">
+            <option value="">Selecciona un área</option>
+            ${areas.map(a=>`<option value="${a}"${pl?.area===a?' selected':''}>${a}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      ${lbl('Descripción breve', '(opcional)')}</div>
+      ${fi('dp-desc',pl?.descripcion,'Síntesis del puesto en una frase')}
+
+      ${sec('1','El puesto')}
+      ${lbl('Denominación oficial del cargo')}</div>
+      ${fi('dp-b1-cargo',pl?.bloque_1?.cargo,'Ej: Asesor/a de Gestión Contable')}
+      ${lbl('Objetivo general','¿Para qué existe este puesto?')}</div>
+      ${ta('dp-b1-objetivo',pl?.bloque_1?.objetivo,'Describe el propósito principal de este cargo dentro de BIPLAZA...',3)}
+      ${lbl('Funciones y tareas principales')}</div>
+      ${ta('dp-b1-funciones',pl?.bloque_1?.funciones,'Lista las responsabilidades clave del puesto...',4)}
+
+      ${sec('2','El perfil')}
+      ${lbl('Formación requerida')}</div>
+      ${fi('dp-b2-form',pl?.bloque_2?.formacion,'Ej: Grado en ADE o FP Grado Superior en Contabilidad')}
+      ${lbl('Competencias técnicas')}</div>
+      ${ta('dp-b2-tec',pl?.bloque_2?.competencias_tecnicas,'Conocimientos y herramientas necesarios para el puesto...',3)}
+      ${lbl('Competencias transversales')}</div>
+      ${ta('dp-b2-tra',pl?.bloque_2?.competencias_transversales,'Comunicación, orientación al cliente, trabajo en equipo...',3)}
+
+      ${sec('3','El desarrollo')}
+      ${lbl('Camino de evolución natural')}</div>
+      ${fi('dp-b3-camino',pl?.bloque_3?.camino,'Ej: Asesor/a Contable N3 o Responsable de Área')}
+      ${lbl('Qué debe demostrar para avanzar')}</div>
+      ${ta('dp-b3-demo',pl?.bloque_3?.que_debe_demostrar,'Capacidades, logros y comportamientos que marcan el salto al siguiente nivel...',4)}
+    </div>
+    <!-- Footer -->
+    <div style="padding:16px 24px;border-top:1px solid var(--bd);display:flex;gap:10px;background:var(--wh);position:sticky;bottom:0">
+      <button class="btn go" style="flex:1;justify-content:center;font-size:13px" onclick="dpGuardar('${pl?.id||''}')">
+        ${isNew?'Crear ficha de puesto':'Guardar cambios'}
+      </button>
+      <button class="btn lt" style="padding:10px 16px;font-size:13px" onclick="closeMo()">Cancelar</button>
+    </div>
+    <div id="dp-st" style="font-size:11px;color:var(--red);text-align:center;padding:0 24px 12px;min-height:14px"></div>
+  </div>`;
+  openMo();
+}
+
+async function dpGuardar(id){
+  const g=s=>document.getElementById(s)?.value||'';
+  const nombre=g('dp-nombre').trim();
+  const area=g('dp-area');
+  if(!nombre){const st=document.getElementById('dp-st');if(st)st.textContent='El nombre del puesto es obligatorio.';return;}
+  const payload={
+    nombre, area,
+    descripcion:g('dp-desc'),
+    bloque_1:{cargo:g('dp-b1-cargo'),objetivo:g('dp-b1-objetivo'),funciones:g('dp-b1-funciones')},
+    bloque_2:{formacion:g('dp-b2-form'),competencias_tecnicas:g('dp-b2-tec'),competencias_transversales:g('dp-b2-tra')},
+    bloque_3:{camino:g('dp-b3-camino'),que_debe_demostrar:g('dp-b3-demo')}
+  };
+  const st=document.getElementById('dp-st');
+  if(st)st.textContent='Guardando...';
+  try{
+    const {data:{user}}=await sb.auth.getUser();
+    if(id){
+      await sb.from('plantillas_puesto').update(payload).eq('id',id);
+    }else{
+      await sb.from('plantillas_puesto').insert({...payload,created_by:user?.id});
+    }
+    closeMo();
+    rendDP();
+  }catch(e){
+    if(st)st.textContent='Error al guardar: '+e.message;
+  }
+}
+
+
 
 
 // ═══════════════════════════════════════════════════════════════════════════
