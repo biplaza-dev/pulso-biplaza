@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- PULSO v8.27mar -->
+<!DOCTYPE html><!-- PULSO v8.27mar-1774621013 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -315,7 +315,7 @@ textarea:focus{outline:none;border-color:var(--oro);box-shadow:0 0 0 3px rgba(21
 .tm-table td{font-size:12.5px;padding:9px 12px;border-bottom:1px solid var(--cD);color:var(--tx2);vertical-align:middle}
 .tm-table tr:last-child td{border-bottom:none}
 /* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:var(--wh);border-radius:var(--r);padding:24px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
 .modal-t{font-size:16px;font-weight:500;margin-bottom:16px}
@@ -821,7 +821,7 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
         </div>
       </div>
       <!-- Tab 1: Guión -->
-      <div id="ay-c1">
+      <div id="ay-c1" style="padding-bottom:48px">
       <div style="display:flex;gap:8px;margin-bottom:16px">
       </div>
       <div style="background:var(--sb);border-radius:var(--r);padding:20px 24px;margin-bottom:16px">
@@ -2383,7 +2383,7 @@ function imprimirSesion(s){if(typeof s==='string')s=JSON.parse(s);
   const notes=Object.values(s.n||{}).filter(Boolean);
 
   // Build print HTML
-  const html=`<!DOCTYPE html><!-- PULSO v8.27mar --><html lang="es"><head><meta charset="UTF-8">
+  const html=`<!DOCTYPE html><!-- PULSO v8.27mar-1774621013 --><html lang="es"><head><meta charset="UTF-8">
 <title>Sesión — ${s.p.n} · ${s.f}</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -3312,7 +3312,7 @@ function descargarGuia(){
       ${tip.items.map(i=>`<div class="tip-item"><span>·</span>${i}</div>`).join('')}
     </div>`).join('');
 
-  const html = `<!DOCTYPE html><!-- PULSO v8.27mar -->
+  const html = `<!DOCTYPE html><!-- PULSO v8.27mar-1774621013 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -3505,6 +3505,7 @@ function ayAll(open){
 }
 
 function blkModalHTML(num){
+  num=parseInt(num,10);
   const d=AY_DETAIL[num];const b=BLOQUES[num-1];
   if(!d||!b)return'';
   const TABS=[
@@ -3580,11 +3581,27 @@ function blkModalHTML(num){
 }
 
 function openBlkModal(num){
-  const bg=document.getElementById('modal-bg');
+  num=parseInt(num,10);
+  if(!num||num<1||num>5) return;
+  // Ensure modal elements exist — create them if missing
+  let bg=document.getElementById('modal-bg');
+  if(!bg){
+    bg=document.createElement('div');
+    bg.className='modal-bg';
+    bg.id='modal-bg';
+    bg.onclick=function(e){if(e.target===bg)closeBM();};
+    const inner=document.createElement('div');
+    inner.className='modal';
+    inner.id='modal-inner';
+    bg.appendChild(inner);
+    document.body.appendChild(bg);
+  }
   const inner=document.getElementById('modal-inner');
-  if(!bg||!inner)return;
-  inner.style.cssText='background:var(--wh);border-radius:var(--r);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);padding:0;max-height:90vh;display:flex;flex-direction:column;width:600px';
-  inner.innerHTML=blkModalHTML(num);
+  if(!inner)return;
+  const html=blkModalHTML(num);
+  if(!html)return;
+  inner.style.cssText='background:var(--wh);border-radius:var(--r);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);padding:0;max-height:90vh;display:flex;flex-direction:column;width:600px;max-width:95vw';
+  inner.innerHTML=html;
   bg.classList.add('open');
 }
 
