@@ -43,7 +43,7 @@ html,body{height:100%;font-family:var(--f);background:var(--cream);color:var(--t
 .ni{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;color:rgba(255,255,255,0.45);font-size:12.5px;border-left:3px solid transparent;transition:all 0.14s;user-select:none;position:relative}
 .ni:hover{background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.78)}
 .ni.on{background:rgba(216,165,95,0.1);color:var(--oro);border-left-color:var(--oro)}
-.ni.cta{background:rgba(216,165,95,0.12);color:var(--oro);border-left-color:var(--oro);font-weight:600}
+.ni.cta{color:var(--tx2);font-weight:600}.ni.cta.on,.ni.cta:hover{background:rgba(216,165,95,0.12);color:var(--oro);border-left-color:var(--oro)}
 .ni.cta:hover{background:rgba(216,165,95,0.2)}
 .ni svg{width:14px;height:14px;flex-shrink:0;opacity:0.5}.ni.on svg,.ni.cta svg{opacity:1}
 .ni .bdg{position:absolute;right:12px;background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
@@ -190,7 +190,7 @@ html,body{height:100%;font-family:var(--f);background:var(--cream);color:var(--t
 .qt tbody tr:last-child td{border-bottom:none}
 .blk-sub{font-size:10px;font-weight:800;color:var(--oroD);text-transform:uppercase;letter-spacing:0.7px;margin:20px 0 10px;display:flex;align-items:center;gap:6px;overflow-wrap:break-word;max-width:760px}
 .nl{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.6px;margin:20px 0 8px;display:flex;align-items:center;gap:6px;max-width:760px}
-textarea{width:100%;border:1px solid var(--bd);border-radius:var(--r2);padding:9px 12px;font-size:12.5px;font-family:var(--f);color:var(--tx);background:var(--wh);resize:vertical;margin-bottom:10px;line-height:1.5;transition:border 0.15s}
+textarea{width:100%;border:1px solid var(--bd);border-radius:var(--r2);padding:9px 12px;font-size:12.5px;font-family:var(--f);color:var(--tx);background:var(--wh);resize:none;overflow:hidden;margin-bottom:10px;line-height:1.5;transition:border 0.15s;min-height:80px}
 textarea:focus{outline:none;border-color:var(--oro);box-shadow:0 0 0 3px rgba(216,165,95,0.1)}
 .ws{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:14px 18px;margin-bottom:10px;display:flex;gap:14px;box-shadow:var(--sh);max-width:760px}
 .wn{width:22px;height:22px;border-radius:50%;background:var(--oro);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--wh);flex-shrink:0;margin-top:2px}
@@ -897,9 +897,9 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
 
       <!-- TAB 1: Datos / Backup -->
       <div id="cfg-c1">
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px">Copia de seguridad</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px">Exportar datos</div>
         <div style="background:var(--oroL);border-radius:var(--r2);padding:11px 14px;font-size:12px;color:var(--oroD);line-height:1.6;margin-bottom:16px">
-          Todos los datos viven en este navegador. Si lo limpias o cambias de dispositivo, se pierden. Exporta regularmente.
+          Exporta un backup completo en JSON con todos los datos de sesiones, compromisos y notas. Útil para archivar o migrar.
         </div>
         <button class="bfull go" onclick="exportBackup()" style="margin-bottom:8px">
           <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2"/></svg>
@@ -1002,6 +1002,19 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
 
 <script>
 // ── Error global para diagnóstico ────────────────────────────────────────────
+
+// Auto-resize textareas
+function autoRz(el){
+  el.style.height='auto';
+  el.style.height=(el.scrollHeight+2)+'px';
+}
+function initAutoRz(){
+  document.querySelectorAll('textarea').forEach(ta=>{
+    ta.addEventListener('input',function(){autoRz(this);});
+    autoRz(ta);
+  });
+}
+
 window.addEventListener('error', function(e){
   console.error('PULSO ERROR:', e.message, 'en', e.filename, 'línea', e.lineno);
 });
@@ -1649,6 +1662,7 @@ function go(id,el){
   mb.style.padding='24px';
   if(id==='ses'){mb.style.padding='0';mb.style.overflow='hidden';}else{mb.style.overflow='';}
   if(id==='db')rendDB();
+  setTimeout(initAutoRz,100);
   if(id==='cal')rendCal();
   if(id==='qs')rendQS();
   if(id==='eq')rendEQ();
