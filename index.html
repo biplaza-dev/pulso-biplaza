@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!-- PULSO v8.27mar -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -872,17 +872,21 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
       </button>
     </div>
     <!-- Tabs -->
-    <div style="display:flex;border-bottom:1px solid var(--bd);flex-shrink:0">
-      <div id="cfg-t1" onclick="cfgTab(1)" style="padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid var(--oro);color:var(--oroD);margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all 0.13s">
-        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-width="2"/></svg>
+    <div style="display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;overflow-x:auto">
+      <div id="cfg-t1" onclick="cfgTab(1)" style="padding:10px 13px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2px solid var(--oro);color:var(--oroD);margin-bottom:-1px;display:flex;align-items:center;gap:5px;transition:all 0.13s;white-space:nowrap;flex-shrink:0">
+        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-width="2"/></svg>
         Datos
       </div>
-      <div id="cfg-t2" onclick="cfgTab(2)" style="padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all 0.13s">
-        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-width="2"/></svg>
+      <div id="cfg-t2" onclick="cfgTab(2)" style="padding:10px 13px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);margin-bottom:-1px;display:flex;align-items:center;gap:5px;transition:all 0.13s;white-space:nowrap;flex-shrink:0">
+        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-width="2"/></svg>
         Factorial
       </div>
-      <div id="cfg-t3" onclick="cfgTab(3)" style="padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all 0.13s">
-        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><path d="M9 9h6M9 13h6M9 17h4" stroke-width="2"/></svg>
+      <div id="cfg-t3" onclick="cfgTab(3)" style="padding:10px 13px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);margin-bottom:-1px;display:flex;align-items:center;gap:5px;transition:all 0.13s;white-space:nowrap;flex-shrink:0">
+        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/></svg>
+        Calendario
+      </div>
+      <div id="cfg-t4" onclick="cfgTab(4)" style="padding:10px 13px;font-size:11.5px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);margin-bottom:-1px;display:flex;align-items:center;gap:5px;transition:all 0.13s;white-space:nowrap;flex-shrink:0">
+        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"/><path d="M9 9h6M9 13h6M9 17h4" stroke-width="2"/></svg>
         Plantillas
       </div>
     </div>
@@ -914,9 +918,11 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
       <!-- TAB 2: Factorial -->
       <div id="cfg-c2" style="display:none">
         <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px">Sincronización con Factorial</div>
-        <div style="background:rgba(216,165,95,0.08);border:1px solid rgba(216,165,95,0.2);border-radius:var(--r2);padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
-          <svg width="16" height="16" fill="none" stroke="var(--oro)" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke-width="2"/><polyline points="22 4 12 14.01 9 11.01" stroke-width="2"/></svg>
-          <div style="font-size:12px;color:var(--tx2);line-height:1.5">Conectado vía <strong style="color:var(--oro)">Supabase Edge Function</strong>. La API key está cifrada en el servidor — no requiere configuración adicional.</div>
+        <div style="background:rgba(216,165,95,0.08);border:1px solid rgba(216,165,95,0.2);border-radius:var(--r2);padding:12px 14px;margin-bottom:16px">
+          <div style="font-size:12px;color:var(--tx2);line-height:1.7">
+            <strong style="color:var(--tx)">¿Cuándo sincronizar?</strong><br>
+            Cuando se incorpore alguien nuevo al equipo, cuando cambie el nombre o el área de una persona, o cuando haya una restructuración. No hace falta sincronizar para el día a día — los datos del OTO (sesiones, compromisos, notas) viven en PULSO de forma independiente.
+          </div>
         </div>
         <button class="bfull go" onclick="syncFactorial()" style="margin-bottom:8px">
           <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke-width="2"/></svg>
@@ -925,26 +931,30 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
         <div class="sync-st idle" id="sync-st" style="margin-top:8px;font-size:11px">Sin sincronizar</div>
 
         <div class="divider" style="margin:20px 0"></div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Datos disponibles desde Factorial</div>
+        <div class="divider" style="margin:20px 0"></div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:10px">Qué se importa</div>
         <div style="font-size:12px;color:var(--tx2);line-height:1.9">
-          <div>✓ Empleados — nombre, email, departamento</div>
-          <div>✓ Contratos y cargos</div>
-          <div>✓ Equipos y estructura</div>
-          <div>✓ Ausencias y vacaciones</div>
-          <div>✓ Asistencia y fichajes</div>
+          <div>✓ Nombre, email y departamento del empleado</div>
+          <div>✓ Contrato activo y cargo oficial</div>
+          <div>✓ Ausencias y vacaciones aprobadas</div>
+          <div>✓ Incidencias de asistencia recientes</div>
+        </div>
+        <div style="margin-top:12px;font-size:11.5px;color:var(--tx3);line-height:1.6;background:var(--cream);border-radius:var(--r2);padding:10px 12px">
+          Sincroniza cuando entren personas nuevas al equipo o cambie la estructura de BIPLAZA. Los datos del OTO (sesiones, compromisos, notas) viven en PULSO independientemente.
         </div>
 
-        <div class="divider" style="margin:20px 0"></div>
+      </div>
 
-        <!-- Outlook Calendar -->
+      <!-- TAB 3: Calendario / Outlook -->
+      <div id="cfg-c3" style="display:none">
         <div style="font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--tx3);margin-bottom:12px">Calendario Outlook</div>
         <div id="outlook-cfg-content">
           <div style="font-size:12px;color:var(--tx3)">Cargando estado...</div>
         </div>
       </div>
 
-      <!-- TAB 3: Plantillas -->
-      <div id="cfg-c3" style="display:none">
+      <!-- TAB 4: Plantillas -->
+      <div id="cfg-c4" style="display:none">
 
         <!-- Sub-tabs internos: OTO / DPT -->
         <div style="display:flex;gap:0;border-bottom:1px solid var(--bd);margin-bottom:18px">
@@ -1575,16 +1585,16 @@ function closeSettings(){
 }
 
 function cfgTab(n){
-  [1,2,3].forEach(i=>{
+  [1,2,3,4].forEach(i=>{
     const t=document.getElementById('cfg-t'+i);
     const c=document.getElementById('cfg-c'+i);
     const on=i===n;
     if(t){t.style.borderBottomColor=on?'var(--oro)':'transparent';t.style.color=on?'var(--oroD)':'var(--tx3)';}
     if(c)c.style.display=on?'block':'none';
   });
-  if(n===1)updateStorageInfo();
-  if(n===2)outlookRendCfg();
-  if(n===3){pvTab(1);}
+  if(n===1) updateStorageInfo();
+  if(n===3) outlookRendCfg();
+  if(n===4) pvTab(1);
 }
 
 function updateStorageInfo(){
@@ -1631,6 +1641,11 @@ function go(id,el){
     if(profNav) profNav.style.display='none';
     const backBtn=document.getElementById('prof-back-btn');
     if(backBtn) backBtn.remove();
+    profPerson=null;
+  }
+  // Reset pAct cuando salimos de sesión activa
+  if(id!=='ses'){
+    pAct=null;
   }
   const mb=document.getElementById('mainbody');
   mb.scrollTop=0;
@@ -2366,7 +2381,7 @@ function imprimirSesion(s){if(typeof s==='string')s=JSON.parse(s);
   const notes=Object.values(s.n||{}).filter(Boolean);
 
   // Build print HTML
-  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  const html=`<!DOCTYPE html><!-- PULSO v8.27mar --><html lang="es"><head><meta charset="UTF-8">
 <title>Sesión — ${s.p.n} · ${s.f}</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -2511,7 +2526,13 @@ function rendHi(){
 function openProfDirect(name){
   if(!name)return;
   const p=loadT().find(x=>x.n===name)||{n:name,a:'',nv:'',on:true};
+  // Limpiar contexto de Beni si cambiamos de persona
+  if(profPerson && profPerson.n !== name){
+    _beniMsgs=[];
+    _beniCtx={tipo:'libre',contexto:{},persona:null};
+  }
   profPerson=p;
+  beniUpdateCtxLbl(name);
   document.getElementById('ni-prof').style.display='flex';
   document.getElementById('ni-prof-n').textContent=name;
   go('prof',document.getElementById('ni-prof'));
@@ -3071,6 +3092,12 @@ async function syncFactorial(){
   const st=document.getElementById('sync-st');
   if(st){st.textContent='Conectando con Factorial...';st.className='sync-st idle';}
 
+  // Quick diagnosis first
+  const diag=await facDiagnosticar();
+  if(!diag.ok){
+    if(st){st.textContent=diag.msg;st.className='sync-st err';}
+    return;
+  }
   const emps=await facCall('employees');
   if(!emps||!emps.length){
     if(st){st.textContent='Sin respuesta de Factorial. Verifica la API key.';st.className='sync-st err';}
@@ -3283,7 +3310,7 @@ function descargarGuia(){
       ${tip.items.map(i=>`<div class="tip-item"><span>·</span>${i}</div>`).join('')}
     </div>`).join('');
 
-  const html = `<!DOCTYPE html>
+  const html = `<!DOCTYPE html><!-- PULSO v8.27mar -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -3448,7 +3475,7 @@ ${blocksHtml}
 // Abre Ajustes directamente en la pestaña Plantillas → sub-tab OTO
 function cfgTabDesdeAY(){
   openSettings();
-  setTimeout(()=>{ cfgTab(3); setTimeout(()=>pvTab(1), 50); }, 100);
+  setTimeout(()=>{ cfgTab(4); setTimeout(()=>pvTab(1), 50); }, 100);
 }
 
 function ayTog(bid){
@@ -3631,7 +3658,7 @@ function openModal(type,idx){
     inner.innerHTML=`<div class="modal-t">Integración con Factorial</div>
     <div style="display:flex;align-items:center;gap:10px;background:rgba(216,165,95,0.08);border:1px solid rgba(216,165,95,0.2);border-radius:var(--r2);padding:12px 14px;margin-bottom:14px">
       <svg width="16" height="16" fill="none" stroke="var(--oro)" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke-width="2"/><polyline points="22 4 12 14.01 9 11.01" stroke-width="2"/></svg>
-      <div style="font-size:12.5px;color:var(--tx2);line-height:1.5">Factorial está conectado automáticamente vía <strong style="color:var(--oro)">Supabase Edge Function</strong>. No requiere configuración adicional.</div>
+      <div style="font-size:12.5px;color:var(--tx2);line-height:1.5">Factorial está conectado a través de un servidor seguro. La API key está cifrada y nunca viaja al navegador.</div>
     </div>
     <div style="font-size:12px;color:var(--tx2);line-height:1.9;margin-bottom:14px">
       <div>✓ La API key está cifrada en Supabase Secrets</div>
@@ -5138,6 +5165,15 @@ let _beniMsgs=[];
 let _beniCtx={tipo:'libre',persona:null,contexto:{}};
 
 function beniToggle(){
+  // Si el contexto de Beni tiene una persona distinta a la que se ve ahora, limpiar
+  const currentPerson = profPerson?.n || (document.getElementById('s-ses')?.classList.contains('on') ? pAct?.n : null) || null;
+  if(_beniCtx?.persona && currentPerson && _beniCtx.persona !== currentPerson){
+    _beniMsgs=[];
+    _beniCtx={tipo:'libre',contexto:{},persona:null};
+    const msgsEl=document.getElementById('beni-msgs');
+    if(msgsEl) msgsEl.innerHTML='';
+  }
+
   _beniOpen=!_beniOpen;
   document.getElementById('beni-drawer').classList.toggle('open',_beniOpen);
   document.getElementById('beni-fab').classList.toggle('open',_beniOpen);
@@ -5200,7 +5236,10 @@ async function beniEnviar(){
   };
 
   // Si hay persona activa en pantalla, añadir su historial
-  const nombre=profPerson?.n||pAct?.n||null;
+  // profPerson = perfil abierto; pAct = sesión activa
+  // Solo usar pAct si estamos EN la pantalla de sesión (id='ses'), nunca en otra sección
+  const enSesion = document.getElementById('s-ses')?.classList.contains('on');
+  const nombre = profPerson?.n || (enSesion ? pAct?.n : null) || null;
   const contexto=nombre?{
     pregunta:txt,
     persona:nombre,
@@ -5278,14 +5317,90 @@ async function beniOrg(){
   await beniLlamar('organizacion',{resumen_equipo:resumen,por_area:porArea,total:equipo.length,fecha:td()},null,[]);
 }
 
+
+// ── Factorial: obtener todos los datos de una persona para Beni ──────────────
+async function facGetPersonaData(nombre){
+  try{
+    // Buscar el empleado en Factorial por nombre
+    const emps=await facCall('employees');
+    if(!emps||!emps.length) return null;
+
+    const normNombre=nombre.toLowerCase();
+    const emp=emps.find(e=>{
+      const full=((e.first_name||e.preferred_name||'')+' '+(e.last_name||'')).toLowerCase();
+      return normNombre.split(' ').some(w=>w.length>2&&full.includes(w));
+    });
+    if(!emp) return null;
+    const empId=emp.id;
+
+    // Fetch en paralelo: contrato, ausencias, asistencia reciente
+    const [contracts,leaves,attendances]=await Promise.all([
+      facCall('contracts',{employee_id:empId}),
+      facCall('leaves',{employee_id:empId}),
+      facCall('attendances',{employee_id:empId,year:new Date().getFullYear(),month:new Date().getMonth()+1})
+    ]);
+
+    // Contrato más reciente
+    const contract=Array.isArray(contracts)&&contracts.length
+      ?contracts.sort((a,b)=>String(b.starts_on||'').localeCompare(String(a.starts_on||'')))[0]
+      :null;
+
+    return{
+      employee:{
+        id:empId,
+        nombre_factorial:((emp.first_name||'')+' '+(emp.last_name||'')).trim(),
+        email:emp.email,
+        antiguedad:emp.date_start||emp.hired_on||null,
+      },
+      contract:contract?{
+        cargo:contract.job_title||contract.role||null,
+        tipo:contract.contract_type||null,
+        horas_semana:contract.working_week_hours||null,
+        inicio:contract.starts_on||null,
+      }:null,
+      leaves:(Array.isArray(leaves)?leaves:[]).slice(0,10).map(l=>({
+        tipo:l.leave_type_name||l.description||'Ausencia',
+        inicio:l.start_on,
+        fin:l.finish_on,
+        estado:l.status,
+      })),
+      attendances:(Array.isArray(attendances)?attendances:[]).slice(0,20).map(a=>({
+        fecha:a.date||a.clock_in?.split('T')[0],
+        minutos:a.minutes,
+        incidencia:a.in_conflict||false,
+        observaciones:a.observations||null,
+      })),
+    };
+  }catch(e){
+    console.warn('facGetPersonaData error:',e);
+    return null;
+  }
+}
+
+// ── Factorial: diagnóstico rápido de conexión ─────────────────────────────────
+async function facDiagnosticar(){
+  const res=await facCall('diagnose');
+  if(res&&res.api_key_ok){
+    return{ok:true,msg:res.message};
+  }
+  return{ok:false,msg:res?.message||'Error de conexión con Factorial'};
+}
+
 async function beniLlamar(tipo,contexto,persona,mensajes){
+  // Actualizar contexto activo para que beniToggle sepa con quién habla Beni
+  if(tipo!=='feedback_wrap') _beniCtx={tipo,contexto,persona:persona||null};
   const loadId='bl'+Date.now();
   beniAddMsg('beni','<em style="opacity:.5;font-size:12px">Pensando...</em>',loadId);
   try{
+    // Fetch Factorial data for the person in background (non-blocking)
+    let factorial_data=null;
+    if(persona){
+      factorial_data=await facGetPersonaData(persona).catch(()=>null);
+    }
     const resp=await fetch(BENI_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json','apikey':FAC_KEY},
-      body:JSON.stringify({tipo,contexto,persona,mensajes,usuario:C.nombreUsuario||null})
+      body:JSON.stringify({tipo,contexto,persona,mensajes,usuario:C.nombreUsuario||null,factorial_data})
     });
     const data=await resp.json();
     if(!resp.ok||data.error){
