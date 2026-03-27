@@ -37,7 +37,7 @@ html,body{height:100%;font-family:var(--f);background:var(--cream);color:var(--t
 .sb-logo{padding:18px 16px 12px;border-bottom:1px solid var(--sbl)}
 .sb-box{border:1.5px solid var(--oro);padding:3px 9px;display:inline-block;margin-bottom:3px}
 .sb-brand{font-size:12px;font-weight:600;color:var(--oro);letter-spacing:1.5px}
-.sb-sub{font-size:9px;color:rgba(255,255,255,0.22);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.sb-sub{font-size:9px;color:var(--oro);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 .sb-nav{flex:1;padding:8px 0;overflow-y:auto}
 .sb-grp{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.18);padding:10px 16px 4px}
 .ni{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;color:rgba(255,255,255,0.45);font-size:12.5px;border-left:3px solid transparent;transition:all 0.14s;user-select:none;position:relative}
@@ -370,7 +370,7 @@ textarea:focus{outline:none;border-color:var(--oro);box-shadow:0 0 0 3px rgba(21
       <div style="width:220px;margin:0 auto 16px;opacity:0.95">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="14 14 2436 820" width="100%" style="display:block">
   <rect x="0" y="0" width="2464" height="1094" fill="#23282E"/>
-  <rect x="24" y="24" width="2416" height="800" fill="#D8A55F"/>
+  <rect x="24" y="24" width="2416" height="800" fill="#FFFFFF"/>
   <g transform="translate(0,1094) scale(0.1,-0.1)" fill="#23282E" fill-rule="evenodd">
     <path d="M520 6700 l0 -3720 11800 0 11800 0 0 3720 0 3720 -11800 0 -11800 0
 0 -3720z m3331 1462 c183 -50 310 -121 424 -237 44 -44 95 -106 114 -137 141
@@ -415,7 +415,7 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
   </g>
 </svg>
       </div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase">Personas &amp; Cultura</div>
+      <div style="font-size:12px;color:#D8A55F;letter-spacing:1px;text-transform:uppercase">Personas &amp; Cultura</div>
     </div>
 
     <!-- Email / magic link -->
@@ -437,7 +437,9 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
         onfocus="this.style.borderColor='var(--oro)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
         onkeydown="if(event.key==='Enter')sendMagicLink()">
       <button onclick="sendMagicLink()" id="login-btn"
-        style="width:100%;padding:11px;background:transparent;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.2);border-radius:var(--r2);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--f)">
+        style="width:100%;padding:11px;background:transparent;color:#D8A55F;border:1px solid #D8A55F;border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--f);transition:all 0.15s"
+        onmouseover="this.style.background='rgba(216,165,95,0.12)'"
+        onmouseout="this.style.background='transparent'">
         Recibir enlace de acceso
       </button>
       <div id="login-err" style="font-size:12px;color:var(--redL);margin-top:8px;min-height:18px;text-align:center"></div>
@@ -463,7 +465,7 @@ l-240 0 -29 33 c-32 34 -60 93 -358 762 -282 634 -514 1144 -520 1145 -3 0
     <div style="width:130px;margin-bottom:4px">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="14 14 2436 820" width="100%" style="display:block">
   <rect x="0" y="0" width="2464" height="1094" fill="#23282E"/>
-  <rect x="24" y="24" width="2416" height="800" fill="#D8A55F"/>
+  <rect x="24" y="24" width="2416" height="800" fill="#FFFFFF"/>
   <g transform="translate(0,1094) scale(0.1,-0.1)" fill="#23282E" fill-rule="evenodd">
     <path d="M520 6700 l0 -3720 11800 0 11800 0 0 3720 0 3720 -11800 0 -11800 0
 0 -3720z m3331 1462 c183 -50 310 -121 424 -237 44 -44 95 -106 114 -137 141
