@@ -5198,7 +5198,9 @@ async function outlookFinalizarAuth(code) {
 
   const res = await outlookProxy('auth-exchange', { code, code_verifier: verifier, redirect_uri });
   if (res.error) {
-    outlookRendCfg('error', res.error);
+    // Show detailed error for debugging
+    const detalle = res.detalle ? ` (${JSON.stringify(res.detalle).substring(0,200)})` : '';
+    outlookRendCfg('error', res.error + detalle);
     return;
   }
   C.outlook = { connected: true, email: res.email, displayName: res.display_name };
