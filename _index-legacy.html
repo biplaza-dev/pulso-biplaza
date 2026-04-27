@@ -5218,11 +5218,59 @@ async function outlookInit() {
   window.addEventListener('message', async (evt) => {
     if (evt.origin !== window.location.origin) return;
     if (evt.data?.type !== 'outlook_auth_code') return;
-    if (evt.data.error) {
-      outlookRendCfg('error', evt.data.error);
-      return;
+
+    const {code, error:oErr} = evt.data;
+    if(oErr){ outlookRendCfg('error','Microsoft rechazó la conexión: '+oErr); return; }
+    if(!code){ outlookRendCfg('error','No se recibió código de autorización'); return; }
+
+    outlookRendCfg('connecting','Conectando con Microsoft...');
+
+    const verifier = sessionStorage.getItem('outlook_pkce_verifier');
+    const redirectUri = window.location.origin + window.location.pathname;
+
+    try {
+      // 1. Intercambio directo desde el navegador (requerido para SPA PKCE)
+      const tokenRes = await fetch(
+        'https://login.microsoftonline.com/76026b37-0e1b-4c67-a198-530d66f8884d/oauth2/v2.0/token',
+        {
+          method: 'POST',
+          headers: {'Content-Type':'application/x-www-form-urlencoded'},
+          body: new URLSearchParams({
+            client_id: '10e450f9-e880-4166-8ee2-bf31f4ed59cf',
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: redirectUri,
+            code_verifier: verifier || '',
+            scope: 'Calendars.ReadWrite Calendars.Read.Shared offline_access User.Read'
+          })
+        }
+      );
+      const tokens = await tokenRes.json();
+      if(!tokenRes.ok){ outlookRendCfg('error','Error de Microsoft: '+(tokens.error_description||tokens.error)); return; }
+
+      // 2. Obtener perfil del usuario
+      const profileRes = await fetch('https://graph.microsoft.com/v1.0/me', {
+        headers:{Authorization:'Bearer '+tokens.access_token}
+      });
+      const profile = await profileRes.json().catch(()=>({}));
+
+      // 3. Guardar tokens en Supabase via edge function
+      const res = await outlookProxy('store-tokens', {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token || '',
+        expires_in: String(tokens.expires_in || 3600),
+        scope: tokens.scope || '',
+        email: profile.mail || profile.userPrincipalName || '',
+        display_name: profile.displayName || ''
+      });
+
+      if(res.error){ outlookRendCfg('error', res.error); return; }
+      outlookRendCfg('ok', res.email || '');
+      sessionStorage.removeItem('outlook_pkce_verifier');
+
+    } catch(e) {
+      outlookRendCfg('error','Error de red: '+e.message);
     }
-    await outlookFinalizarAuth(evt.data.code);
   });
   outlookRendCfg();
 }
