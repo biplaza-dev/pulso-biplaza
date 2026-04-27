@@ -5310,7 +5310,7 @@ async function outlookConectar() {
   }
 }
 
-// ── Finalizar OAuth: enviar code al proxy ─────────────────────────────────────
+// ── Finalizar OAuth: intercambio PKCE directo desde el navegador ──────────────
 async function outlookFinalizarAuth(code) {
   outlookRendCfg('connecting');
   const verifier     = sessionStorage.getItem('outlook_verifier') || '';
@@ -5318,14 +5318,61 @@ async function outlookFinalizarAuth(code) {
   sessionStorage.removeItem('outlook_verifier');
   sessionStorage.removeItem('outlook_redirect');
 
-  const res = await outlookProxy('auth-exchange', { code, code_verifier: verifier, redirect_uri });
-  if (res.error) {
-    // Show detailed error for debugging
-    const detalle = res.detalle ? ` (${JSON.stringify(res.detalle).substring(0,200)})` : '';
-    outlookRendCfg('error', res.error + detalle);
+  // 1. Intercambio de código por tokens directamente con Microsoft (PKCE SPA)
+  let tokens;
+  try {
+    const tokenRes = await fetch(
+      'https://login.microsoftonline.com/76026b37-0e1b-4c67-a198-530d66f8884d/oauth2/v2.0/token',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id:     '10e450f9-e880-4166-8ee2-bf31f4ed59cf',
+          grant_type:    'authorization_code',
+          code,
+          redirect_uri,
+          code_verifier: verifier,
+          scope:         'Calendars.ReadWrite Calendars.Read.Shared offline_access User.Read',
+        }),
+      }
+    );
+    tokens = await tokenRes.json();
+    if (!tokenRes.ok || tokens.error) {
+      outlookRendCfg('error', tokens.error_description || tokens.error || 'Error al obtener tokens');
+      return;
+    }
+  } catch (e) {
+    outlookRendCfg('error', 'Error de red al conectar con Microsoft');
     return;
   }
-  C.outlook = { connected: true, email: res.email, displayName: res.display_name };
+
+  // 2. Obtener perfil del usuario desde Graph
+  let email = '', displayName = '';
+  try {
+    const meRes = await fetch('https://graph.microsoft.com/v1.0/me', {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+    });
+    if (meRes.ok) {
+      const me = await meRes.json();
+      email       = me.mail || me.userPrincipalName || '';
+      displayName = me.displayName || '';
+    }
+  } catch (_) { /* perfil no crítico */ }
+
+  // 3. Guardar tokens en Supabase vía edge function
+  const res = await outlookProxy('store-tokens', {
+    access_token:  tokens.access_token,
+    refresh_token: tokens.refresh_token || '',
+    expires_in:    tokens.expires_in,
+    scope:         tokens.scope,
+    email,
+    display_name:  displayName,
+  });
+  if (res.error) {
+    outlookRendCfg('error', res.error);
+    return;
+  }
+  C.outlook = { connected: true, email, displayName };
   outlookRendCfg();
 }
 
