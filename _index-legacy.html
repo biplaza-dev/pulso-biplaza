@@ -3711,6 +3711,7 @@ function descargarGuia(){
   .print-btn{background:#D8A55F;color:#23282E;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(216,165,95,0.4)}
   .print-btn:hover{opacity:0.9}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
 
@@ -5044,16 +5045,26 @@ async function dpImportarDocumento(input){
 
     if(file.name.endsWith('.txt')){
       textoDocumento=await file.text();
-    } else if(file.name.endsWith('.docx')||file.name.endsWith('.pdf')){
-      // Convertir a base64 y enviarlo a Beni para que lo procese
+    } else if(file.name.endsWith('.docx')){
+      // Extraer texto de DOCX con mammoth.js
+      setSt('Extrayendo texto del documento Word...');
+      const arrayBuffer=await file.arrayBuffer();
+      const result=await mammoth.extractRawText({arrayBuffer});
+      textoDocumento=result.value||'';
+      if(!textoDocumento.trim()){
+        throw new Error('No se pudo extraer texto del documento. Prueba con formato .txt');
+      }
+    } else if(file.name.endsWith('.pdf')){
+      // PDF: convertir a base64 completo para que Beni lo procese como documento
+      setSt('Procesando PDF...');
       const base64=await new Promise((res,rej)=>{
         const r=new FileReader();
         r.onload=()=>res(r.result.split(',')[1]);
         r.onerror=rej;
         r.readAsDataURL(file);
       });
-      // Para DOCX/PDF: enviar como texto indicando que es base64
-      textoDocumento=`[ARCHIVO: ${file.name}]\n[TIPO: ${file.type}]\n[BASE64: ${base64.substring(0,500)}...]\n\nNota: El sistema ha detectado un documento ${file.name.endsWith('.docx')?'Word':'PDF'}. Por favor extrae toda la información relevante sobre el puesto de trabajo que puedas inferir del nombre del archivo y crea una ficha estructurada.`;
+      // Enviar base64 completo — la edge function lo enviará a Claude como documento PDF
+      textoDocumento=`[PDF_BASE64:${base64}]`;
     }
 
     setSt('Generando ficha con Beni...');
