@@ -5046,16 +5046,17 @@ async function dpImportarDocumento(input){
     if(file.name.endsWith('.txt')){
       textoDocumento=await file.text();
     } else if(file.name.endsWith('.docx')){
-      // Extraer texto de DOCX con mammoth.js
       setSt('Extrayendo texto del documento Word...');
+      if(typeof mammoth === 'undefined'){
+        throw new Error('mammoth.js no disponible. Recarga la página e inténtalo de nuevo.');
+      }
       const arrayBuffer=await file.arrayBuffer();
       const result=await mammoth.extractRawText({arrayBuffer});
       textoDocumento=result.value||'';
       if(!textoDocumento.trim()){
-        throw new Error('No se pudo extraer texto del documento. Prueba con formato .txt');
+        throw new Error('No se pudo extraer texto del documento Word. Prueba guardándolo como .txt');
       }
     } else if(file.name.endsWith('.pdf')){
-      // PDF: convertir a base64 completo para que Beni lo procese como documento
       setSt('Procesando PDF...');
       const base64=await new Promise((res,rej)=>{
         const r=new FileReader();
@@ -5063,7 +5064,6 @@ async function dpImportarDocumento(input){
         r.onerror=rej;
         r.readAsDataURL(file);
       });
-      // Enviar base64 completo — la edge function lo enviará a Claude como documento PDF
       textoDocumento=`[PDF_BASE64:${base64}]`;
     }
 
